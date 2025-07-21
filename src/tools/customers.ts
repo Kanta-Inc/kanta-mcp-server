@@ -241,26 +241,26 @@ export function createCustomerTools(client: KantaClient): Tool[] {
         required: ['id'],
       },
     },
-    {
-      name: 'download_customer_risk_report',
-      description: 'Télécharge le rapport de risque d\'un client (PDF ou ZIP)',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID UUID du client',
-          },
-          include_documents: {
-            type: 'boolean',
-            description: 'Inclure les documents (false=PDF, true=ZIP avec PDF et documents)',
-            default: false,
-          },
-        },
-        required: ['id'],
-      },
-    },
+    // {
+    //   name: 'download_customer_risk_report',
+    //   description: 'Télécharge le rapport de risque d\'un client (PDF ou ZIP)',
+    //   inputSchema: {
+    //     type: 'object',
+    //     properties: {
+    //       id: {
+    //         type: 'string',
+    //         format: 'uuid',
+    //         description: 'ID UUID du client',
+    //       },
+    //       include_documents: {
+    //         type: 'boolean',
+    //         description: 'Inclure les documents (false=PDF, true=ZIP avec PDF et documents)',
+    //         default: false,
+    //       },
+    //     },
+    //     required: ['id'],
+    //   },
+    // },
   ];
 }
 
@@ -325,22 +325,22 @@ export async function handleCustomerTool(
       return await client.getCustomerRiskSummary(id);
     }
     
-    case 'download_customer_risk_report': {
-      const { id, include_documents } = z.object({
-        id: z.string().uuid(),
-        include_documents: z.boolean().optional(),
-      }).parse(args);
-      
-      const blob = await client.downloadCustomerRiskReport(id, include_documents);
-      
-      // Pour les fichiers binaires, on retourne une représentation textuelle
-      return {
-        message: `Rapport de risque téléchargé pour le client ${id}`,
-        contentType: blob.type,
-        size: blob.size,
-        note: 'Le fichier binaire a été téléchargé avec succès. Dans un vrai contexte, il serait sauvegardé ou retourné au client.',
-      };
-    }
+    // case 'download_customer_risk_report': {
+    //   const { id, include_documents } = z.object({
+    //     id: z.string().uuid(),
+    //     include_documents: z.boolean().optional(),
+    //   }).parse(args);
+    //   
+    //   const blob = await client.downloadCustomerRiskReport(id, include_documents);
+    //   
+    //   // Pour les fichiers binaires, on retourne une représentation textuelle
+    //   return {
+    //     message: `Rapport de risque téléchargé pour le client ${id}`,
+    //     contentType: blob.type,
+    //     size: blob.size,
+    //     note: 'Le fichier binaire a été téléchargé avec succès. Dans un vrai contexte, il serait sauvegardé ou retourné au client.',
+    //   };
+    // }
     
     default:
       throw new Error(`Outil client inconnu: ${name}`);

@@ -27,21 +27,21 @@ export function createMiscTools(client: KantaClient): Tool[] {
         properties: {},
       },
     },
-    {
-      name: 'download_file',
-      description: 'Télécharge un fichier par son ID',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID UUID du fichier à télécharger',
-          },
-        },
-        required: ['id'],
-      },
-    },
+    // {
+    //   name: 'download_file',
+    //   description: 'Télécharge un fichier par son ID',
+    //   inputSchema: {
+    //     type: 'object',
+    //     properties: {
+    //       id: {
+    //         type: 'string',
+    //         format: 'uuid',
+    //         description: 'ID UUID du fichier à télécharger',
+    //       },
+    //     },
+    //     required: ['id'],
+    //   },
+    // },
   ];
 }
 
@@ -60,18 +60,18 @@ export async function handleMiscTool(
       return await client.getStructure();
     }
     
-    case 'download_file': {
-      const { id } = z.object({ id: z.string().uuid() }).parse(args);
-      const blob = await client.downloadFile(id);
-      
-      // Pour les fichiers binaires, on retourne une représentation textuelle
-      return {
-        message: `Fichier téléchargé avec l'ID ${id}`,
-        contentType: blob.type,
-        size: blob.size,
-        note: 'Le fichier binaire a été téléchargé avec succès. Dans un vrai contexte, il serait sauvegardé ou retourné au client.',
-      };
-    }
+    // case 'download_file': {
+    //   const { id } = z.object({ id: z.string().uuid() }).parse(args);
+    //   const blob = await client.downloadFile(id);
+    //   
+    //   // Pour les fichiers binaires, on retourne une représentation textuelle
+    //   return {
+    //     message: `Fichier téléchargé avec l'ID ${id}`,
+    //     contentType: blob.type,
+    //     size: blob.size,
+    //     note: 'Le fichier binaire a été téléchargé avec succès. Dans un vrai contexte, il serait sauvegardé ou retourné au client.',
+    //   };
+    // }
     
     default:
       throw new Error(`Outil divers inconnu: ${name}`);

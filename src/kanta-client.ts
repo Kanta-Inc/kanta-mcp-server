@@ -170,26 +170,26 @@ export class KantaClient {
     return response.data;
   }
 
-  async downloadCustomerRiskReport(id: string, includeDocuments?: boolean): Promise<Blob> {
-    const searchParams = new URLSearchParams();
-    if (includeDocuments !== undefined) {
-      searchParams.set('include_documents', includeDocuments.toString());
-    }
-    
-    const url = `${this.baseUrl}/customers/${id}/risk-report-document${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
-    const response = await fetch(url, {
-      headers: {
-        'X-API-Key': this.apiKey,
-      },
-    });
+  // async downloadCustomerRiskReport(id: string, includeDocuments?: boolean): Promise<Blob> {
+  //   const searchParams = new URLSearchParams();
+  //   if (includeDocuments !== undefined) {
+  //     searchParams.set('include_documents', includeDocuments.toString());
+  //   }
+  //   
+  //   const url = `${this.baseUrl}/customers/${id}/risk-report-document${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+  //   const response = await fetch(url, {
+  //     headers: {
+  //       'X-API-Key': this.apiKey,
+  //     },
+  //   });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
-    }
+  //   if (!response.ok) {
+  //     const errorText = await response.text();
+  //     throw new Error(`HTTP ${response.status}: ${errorText}`);
+  //   }
 
-    return response.blob();
-  }
+  //   return response.blob();
+  // }
 
   // Users endpoints
   async getUsers(params?: {
@@ -275,46 +275,46 @@ export class KantaClient {
     return response.data;
   }
 
-  async uploadPersonDocument(
-    id: string,
-    data: {
-      type?: 'id_card' | 'passport' | 'driver_license' | 'residence_permit';
-      title?: string;
-      issue_date?: string;
-      expiration_date?: string;
-      comment?: string;
-      files: File[];
-    }
-  ): Promise<Person> {
-    const formData = new FormData();
-    
-    if (data.type) formData.append('type', data.type);
-    if (data.title) formData.append('title', data.title);
-    if (data.issue_date) formData.append('issue_date', data.issue_date);
-    if (data.expiration_date) formData.append('expiration_date', data.expiration_date);
-    if (data.comment) formData.append('comment', data.comment);
-    
-    data.files.forEach((file) => {
-      formData.append('files[]', file);
-    });
+  // async uploadPersonDocument(
+  //   id: string,
+  //   data: {
+  //     type?: 'id_card' | 'passport' | 'driver_license' | 'residence_permit';
+  //     title?: string;
+  //     issue_date?: string;
+  //     expiration_date?: string;
+  //     comment?: string;
+  //     files: File[];
+  //   }
+  // ): Promise<Person> {
+  //   const formData = new FormData();
+  //   
+  //   if (data.type) formData.append('type', data.type);
+  //   if (data.title) formData.append('title', data.title);
+  //   if (data.issue_date) formData.append('issue_date', data.issue_date);
+  //   if (data.expiration_date) formData.append('expiration_date', data.expiration_date);
+  //   if (data.comment) formData.append('comment', data.comment);
+  //   
+  //   data.files.forEach((file) => {
+  //     formData.append('files[]', file);
+  //   });
 
-    const url = `${this.baseUrl}/persons/${id}/document`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'X-API-Key': this.apiKey,
-      },
-      body: formData,
-    });
+  //   const url = `${this.baseUrl}/persons/${id}/document`;
+  //   const response = await fetch(url, {
+  //     method: 'POST',
+  //     headers: {
+  //       'X-API-Key': this.apiKey,
+  //     },
+  //     body: formData,
+  //   });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
-    }
+  //   if (!response.ok) {
+  //     const errorText = await response.text();
+  //     throw new Error(`HTTP ${response.status}: ${errorText}`);
+  //   }
 
-    const responseData = await response.json();
-    return PersonApiResponseSchema.parse(responseData).data;
-  }
+  //   const responseData = await response.json();
+  //   return PersonApiResponseSchema.parse(responseData).data;
+  // }
 
   // Firms endpoints
   async getFirms(params?: {
@@ -346,19 +346,19 @@ export class KantaClient {
   }
 
   // Files endpoint
-  async downloadFile(id: string): Promise<Blob> {
-    const url = `${this.baseUrl}/files/${id}`;
-    const response = await fetch(url, {
-      headers: {
-        'X-API-Key': this.apiKey,
-      },
-    });
+  // async downloadFile(id: string): Promise<Blob> {
+  //   const url = `${this.baseUrl}/files/${id}`;
+  //   const response = await fetch(url, {
+  //     headers: {
+  //       'X-API-Key': this.apiKey,
+  //     },
+  //   });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
-    }
+  //   if (!response.ok) {
+  //     const errorText = await response.text();
+  //     throw new Error(`HTTP ${response.status}: ${errorText}`);
+  //   }
 
-    return response.blob();
-  }
+  //   return response.blob();
+  // }
 }
