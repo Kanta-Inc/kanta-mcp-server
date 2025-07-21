@@ -1,4 +1,5 @@
 # Kanta MCP Server
+[![smithery badge](https://smithery.ai/badge/@Kanta-Inc/kanta-mcp-server)](https://smithery.ai/server/@Kanta-Inc/kanta-mcp-server)
 
 Un serveur MCP (Model Context Protocol) pour l'API Kanta, permettant l'intégration avec des modèles de langage comme Claude.
 
@@ -42,6 +43,15 @@ Ce serveur MCP expose les fonctionnalités de l'API Kanta v1.1 à travers le pro
 
 ## Installation
 
+### Installing via Smithery
+
+To install kanta-mcp-server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@Kanta-Inc/kanta-mcp-server):
+
+```bash
+npx -y @smithery/cli install @Kanta-Inc/kanta-mcp-server --client claude
+```
+
+### Manual Installation
 1. Cloner le repository :
 ```bash
 git clone <repository-url>
