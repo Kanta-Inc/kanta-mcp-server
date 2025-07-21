@@ -82,8 +82,8 @@ export class KantaClient {
     
     const endpoint = `/customers${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
     const response = await this.makeRequest(endpoint, {
-      schema: CustomersListApiResponseSchema,
-    });
+      schema: CustomersListApiResponseSchema as any,
+    }) as any;
     
     return {
       data: response.data,
@@ -96,8 +96,8 @@ export class KantaClient {
 
   async getCustomer(id: string): Promise<Customer> {
     const response = await this.makeRequest(`/customers/${id}`, {
-      schema: CustomerApiResponseSchema,
-    });
+      schema: CustomerApiResponseSchema as any,
+    }) as any;
     return response.data;
   }
 
@@ -105,8 +105,8 @@ export class KantaClient {
     const response = await this.makeRequest('/customers', {
       method: 'POST',
       body: data,
-      schema: CustomerApiResponseSchema,
-    });
+      schema: CustomerApiResponseSchema as any,
+    }) as any;
     return response.data;
   }
 
@@ -114,8 +114,8 @@ export class KantaClient {
     const response = await this.makeRequest(`/customers/${id}`, {
       method: 'PUT',
       body: data,
-      schema: CustomerApiResponseSchema,
-    });
+      schema: CustomerApiResponseSchema as any,
+    }) as any;
     return response.data;
   }
 
@@ -134,8 +134,8 @@ export class KantaClient {
     if (params.page) searchParams.set('page', params.page.toString());
     
     const response = await this.makeRequest(`/customers/search?${searchParams.toString()}`, {
-      schema: CustomersListApiResponseSchema,
-    });
+      schema: CustomersListApiResponseSchema as any,
+    }) as any;
     
     return {
       data: response.data,

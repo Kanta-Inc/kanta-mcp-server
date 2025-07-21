@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Base schemas
 export const UUIDSchema = z.string().uuid();
 export const DateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
-export const RiskLevelSchema = z.enum(['low', 'medium', 'high', 'not_established']);
+export const RiskLevelSchema = z.enum(['low', 'medium', 'high', 'not_established', 'Low', 'Medium', 'High', 'standard', 'enhanced']).transform(val => val.toLowerCase());
 export const CustomerStateSchema = z.enum(['draft', 'in_progress', 'valid', 'ended', 'to_validate']);
 export const UserRoleSchema = z.enum(['certified accountant', 'controller', 'collaborator']);
 export const DocumentTypeSchema = z.enum(['id_card', 'passport', 'driver_license', 'residence_permit']);
@@ -25,18 +25,18 @@ export const CustomerAddressResourceSchema = z.object({
   city: z.string(),
   country: CountryResourceSchema,
   is_headquarter: z.boolean(),
-  address_area: AddressAreaResourceSchema,
-  additional_information: z.string().optional(),
+  address_area: AddressAreaResourceSchema.nullable(),
+  additional_information: z.string().nullable().optional(),
 });
 
 export const PersonAddressResourceSchema = z.object({
-  street: z.string(),
-  zip_code: z.string(),
-  city: z.string(),
-  country: CountryResourceSchema,
+  street: z.string().nullable(),
+  zip_code: z.string().nullable(),
+  city: z.string().nullable(),
+  country: CountryResourceSchema.nullable(),
   is_main_residence: z.boolean(),
-  address_area: AddressAreaResourceSchema,
-  additional_information: z.string().optional(),
+  address_area: AddressAreaResourceSchema.nullable(),
+  additional_information: z.string().nullable().optional(),
 });
 
 // Activity schema
@@ -50,15 +50,15 @@ export const ActivityResourceSchema = z.object({
 // Mission schema
 export const MissionResourceSchema = z.object({
   label: z.string(),
-  description: z.string(),
-  start_date: z.string(),
-  end_date: z.string(),
+  description: z.string().nullable(),
+  start_date: z.string().nullable(),
+  end_date: z.string().nullable(),
   risk: RiskLevelSchema,
 });
 
 // Affectation schema
 export const AffectationResourceSchema = z.object({
-  id: UUIDSchema,
+  id: z.union([z.string(), z.number()]).transform(val => String(val)),
   object: z.string(),
   first_name: z.string(),
   last_name: z.string(),
@@ -77,22 +77,22 @@ export const DiligenceResourceSchema = z.object({
 
 // Document schemas
 export const CustomerDocumentResourceSchema = z.object({
-  type: z.string(),
-  title: z.string(),
-  issue_date: DateSchema,
-  expiration_date: DateSchema.optional(),
-  comment: z.string().optional(),
+  type: z.string().nullable(),
+  title: z.string().nullable(),
+  issue_date: DateSchema.nullable(),
+  expiration_date: DateSchema.nullable().optional(),
+  comment: z.string().nullable().optional(),
   file_list: z.array(UUIDSchema),
 });
 
 export const PersonDocumentResourceSchema = z.object({
   type: z.string(),
   title: z.string(),
-  issue_date: DateSchema,
-  expiration_date: DateSchema.optional(),
+  issue_date: DateSchema.nullable(),
+  expiration_date: DateSchema.nullable().optional(),
   comment: z.string().optional(),
   file_list: z.array(UUIDSchema),
-  person_id: UUIDSchema,
+  person_id: UUIDSchema.optional(),
 });
 
 // Person schema
@@ -103,43 +103,43 @@ export const CustomerPersonResourceSchema = z.object({
   person_acting_on_behalf: z.boolean(),
   beneficial_owner: z.boolean(),
   legal_representative: z.boolean(),
-  role: z.string(),
-  date_of_birth: z.string(),
-  city_of_birth: z.string(),
-  birth_country: CountryResourceSchema,
-  nationality: CountryResourceSchema,
+  role: z.string().nullable(),
+  date_of_birth: z.string().nullable(),
+  city_of_birth: z.string().nullable(),
+  birth_country: CountryResourceSchema.nullable(),
+  nationality: CountryResourceSchema.nullable(),
   met_and_certify_identity: z.boolean(),
   address_list: z.array(PersonAddressResourceSchema),
-  other_activities: z.string().optional(),
+  other_activities: z.string().nullable().optional(),
   politically_exposed_person: z.boolean(),
   integrity_reputation_doubts: z.boolean(),
   assets_freeze: z.boolean().optional(),
-  observation: z.string().optional(),
+  observation: z.string().nullable().optional(),
   document_list: z.array(PersonDocumentResourceSchema),
 });
 
 // Customer schema
 export const CustomerResourceSchema = z.object({
   id: UUIDSchema,
-  legal_type_code: z.number(),
-  legal_type_label: z.string(),
-  code: z.string(),
+  legal_type_code: z.number().nullable(),
+  legal_type_label: z.string().nullable(),
+  code: z.string().nullable(),
   company_name: z.string(),
-  company_number: z.string(),
-  company_country: z.string(),
-  email: z.string().email().optional(),
-  phone: z.string().optional(),
-  creation_date: z.string(),
-  fiscal_year_end_date: z.string(),
+  company_number: z.string().nullable(),
+  company_country: z.string().nullable(),
+  email: z.string().email().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  creation_date: z.string().nullable(),
+  fiscal_year_end_date: z.string().nullable(),
   activity_list: z.array(ActivityResourceSchema),
   address_list: z.array(CustomerAddressResourceSchema),
   person_list: z.array(CustomerPersonResourceSchema),
   mission_list: z.array(MissionResourceSchema),
-  relationship_start_date: z.string(),
+  relationship_start_date: z.string().nullable(),
   state: CustomerStateSchema,
-  relationship_end_date: z.string().optional(),
-  accountant_choice_reason: z.string().optional(),
-  relationship_description: z.string().optional(),
+  relationship_end_date: z.string().nullable().optional(),
+  accountant_choice_reason: z.string().nullable().optional(),
+  relationship_description: z.string().nullable().optional(),
   vigilance_level: RiskLevelSchema,
   risk_summary: z.object({
     location: RiskLevelSchema,
@@ -148,8 +148,8 @@ export const CustomerResourceSchema = z.object({
     customer: RiskLevelSchema,
   }),
   diligences: z.array(DiligenceResourceSchema),
-  observation: z.string().optional(),
-  turnover: z.number().optional(),
+  observation: z.string().nullable().optional(),
+  turnover: z.number().nullable().optional(),
   affectation_list: z.array(AffectationResourceSchema),
   document_list: z.array(CustomerDocumentResourceSchema),
 });
@@ -322,12 +322,12 @@ export const StructureApiResponseSchema = ApiResponseSchema.extend({
   data: StructureResourceSchema,
 });
 
-// Type exports
-export type Customer = z.infer<typeof CustomerResourceSchema>;
-export type User = z.infer<typeof UserResourceSchema>;
-export type Person = z.infer<typeof PersonResourceSchema>;
-export type Firm = z.infer<typeof FirmResourceSchema>;
-export type Structure = z.infer<typeof StructureResourceSchema>;
+// Type exports - using output types to get transformed values
+export type Customer = z.output<typeof CustomerResourceSchema>;
+export type User = z.output<typeof UserResourceSchema>;
+export type Person = z.output<typeof PersonResourceSchema>;
+export type Firm = z.output<typeof FirmResourceSchema>;
+export type Structure = z.output<typeof StructureResourceSchema>;
 export type CreateCustomerRequest = z.infer<typeof CreateCustomerRequestSchema>;
 export type UpdateCustomerRequest = z.infer<typeof UpdateCustomerRequestSchema>;
 export type AssignmentRequest = z.infer<typeof AssignmentRequestSchema>;
