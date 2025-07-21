@@ -90,7 +90,7 @@ export const PersonDocumentResourceSchema = z.object({
   title: z.string(),
   issue_date: DateSchema.nullable(),
   expiration_date: DateSchema.nullable().optional(),
-  comment: z.string().optional(),
+  comment: z.string().nullable().optional(),
   file_list: z.array(UUIDSchema),
   person_id: UUIDSchema.optional(),
 });
