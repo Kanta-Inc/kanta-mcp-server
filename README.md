@@ -9,9 +9,9 @@ Ce serveur MCP expose les fonctionnalités de l'API Kanta v1.1 à travers le pro
 
 - Gérer les clients (création, mise à jour, recherche, assignation)
 - Administrer les utilisateurs
-- Manipuler les données des personnes
+- Consulter les données des personnes
 - Accéder aux informations des cabinets et structures
-- Télécharger des fichiers et rapports
+- Récupérer les résumés de risques
 
 ## Fonctionnalités
 
@@ -23,7 +23,6 @@ Ce serveur MCP expose les fonctionnalités de l'API Kanta v1.1 à travers le pro
 - `search_customers` : Rechercher des clients
 - `assign_customers` : Assigner superviseurs/contributeurs
 - `get_customer_risk_summary` : Récupérer le résumé des risques
-- `download_customer_risk_report` : Télécharger le rapport de risque
 
 ### Gestion des Utilisateurs
 - `get_users` : Lister les utilisateurs
@@ -34,12 +33,10 @@ Ce serveur MCP expose les fonctionnalités de l'API Kanta v1.1 à travers le pro
 ### Gestion des Personnes
 - `get_persons` : Lister les personnes
 - `get_person` : Récupérer une personne par ID
-- `upload_person_document` : Uploader un document d'identité
 
 ### Autres Fonctionnalités
 - `get_firms` : Lister les cabinets
 - `get_structure` : Récupérer les informations de structure
-- `download_file` : Télécharger un fichier par ID
 
 ## Installation
 
@@ -145,9 +142,9 @@ Ce serveur utilise l'API Kanta v1.1. Pour plus d'informations sur l'API :
 
 ## Limitations
 
-- Les uploads de fichiers pour les documents de personnes sont simplifiés dans cette implémentation
-- Les téléchargements de fichiers binaires retournent des métadonnées plutôt que les fichiers eux-mêmes
+- Les fonctionnalités d'upload/download de fichiers ne sont pas disponibles (limitation MCP)
 - Toutes les opérations nécessitent une clé API valide Kanta
+- Focus sur les opérations CRUD et la consultation des données JSON
 
 ## Licence
 
