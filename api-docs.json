@@ -1,0 +1,2994 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Kanta API",
+        "version": "1.1"
+    },
+    "servers": [
+        {
+            "url": "https://app.kanta.fr/api/v1",
+            "description": "Kanta API Server"
+        }
+    ],
+    "paths": {
+        "/customers": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Get all customers",
+                "description": "Customers are the main work material for the accountant.<br>By default, the list is ordered by created_at. This way you can retrieve the last customer created setting a limit of 1.",
+                "operationId": "findAllCustomers",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Customers list of structures",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomersListApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Create a new customer",
+                "description": "You can create a customer with his company number. For french companies, use the SIREN or the SIRET.<br>If you create the customer with the SIREN, the headquarter will be chose during the creation.",
+                "operationId": "createCustomer",
+                "requestBody": {
+                    "description": "Customer creation form",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCustomerRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/customers/{id}": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Get a customer",
+                "description": "The customer is the main work material for the accountant.",
+                "operationId": "findCustomerById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Customer find with id",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Update customer",
+                "operationId": "updateCustomer",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Customer update form",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCustomerRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Customer updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/customers/assignment": {
+            "post": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Assign supervisors, contributors and firm to customers",
+                "description": "Provide an array of customers id. The assignment will affect them all. The array must contain at least one customer id.<br>When contributors array is provided, old contributors assignment will be erased. To keep them, add them in the new contributors array.<br>Provide null to unassign a supervisor or a firm. **The unasigned supervisor will be replaced by the structure owner**.<br>Provide an empty array to unassign all contributors.<br>Missing optional parameters will be ignored.",
+                "operationId": "customersAssignment",
+                "requestBody": {
+                    "description": "Assignment form",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssignmentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "List of customers with updated assignments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomersAssignmentApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/customers/search": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Search customer by company number, company name or code.",
+                "description": "You can use one or more parameters. The search is case insensitive and is done on the structure of the user.",
+                "operationId": "searchCustomer",
+                "parameters": [
+                    {
+                        "name": "company_number",
+                        "in": "query",
+                        "description": "company_number",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "88992432000019"
+                        }
+                    },
+                    {
+                        "name": "company_name",
+                        "in": "query",
+                        "description": "company_name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "kanta"
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "code client",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "k14"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Customers list of structures",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomersListApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/files/{id}": {
+            "get": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Download a file",
+                "description": "Download a file by its id",
+                "operationId": "download",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "File id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File object"
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/firms": {
+            "get": {
+                "tags": [
+                    "Firms"
+                ],
+                "summary": "Get all firms",
+                "description": "Get all firms of the user's structure.",
+                "operationId": "findAllFirms",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Firms",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FirmListApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/persons": {
+            "get": {
+                "tags": [
+                    "Persons"
+                ],
+                "summary": "Get all persons",
+                "description": "Return a list of persons. The persons are returned sorted by creation date, with the most recent customers appearing first. Max limit is 100.",
+                "operationId": "findAllPersons",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Person list of structure",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PersonsListApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/persons/{id}": {
+            "get": {
+                "tags": [
+                    "Persons"
+                ],
+                "summary": "Get a person",
+                "description": "Retrieves a person by id",
+                "operationId": "getPersonById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Person id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A person",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PersonApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/persons/{id}/document": {
+            "post": {
+                "tags": [
+                    "Persons"
+                ],
+                "summary": "Upload person identity document",
+                "description": "Upload a person’s document like passport or id card.",
+                "operationId": "uploadPersonDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Person id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "You need to send a `multipart/form-data` request and include files in the `files[]` array.",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UploadPersonDocumentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "A person",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PersonApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/customers/{id}/risk-summary": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Get a customer's risk summary",
+                "description": "The risks are split into four different types : location, mission, activity, customer. They can have four different effective_risk values : low, medium, high, not established. They are determined by your structure parameters, including custom parameters. They may contain a modulation or a sensible operation, particular to a risk.",
+                "operationId": "findRiskByClientId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "RiskSummary",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RiskSummaryApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/customers/{id}/risk-report-document": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Download risk report document",
+                "operationId": "downloadRiskReportDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/include_documents"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "RiskReportDocument",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            },
+                            "application/zip": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                }
+            }
+        },
+        "/structure": {
+            "get": {
+                "tags": [
+                    "Structures"
+                ],
+                "summary": "Get structure",
+                "description": "The structure is necessarily yours.",
+                "operationId": "getStructure",
+                "responses": {
+                    "200": {
+                        "description": "Structure",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StructureApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all users",
+                "description": "Get all users",
+                "operationId": "findAllUsers",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User list of structures",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsersListApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a user",
+                "operationId": "createUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The user created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get a user",
+                "operationId": "findUserByUuid",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete a user",
+                "description": "Delete a user",
+                "operationId": "deleteUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Customer id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The user deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserDeletedApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "General error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ResponseUrl": {
+                "description": "The URL of the current request",
+                "type": "string",
+                "format": "url"
+            },
+            "ResponseObjectType": {
+                "description": "The response object",
+                "type": "string"
+            },
+            "PaginationInfo": {
+                "properties": {
+                    "total_data": {
+                        "description": "Total data count",
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "per_page": {
+                        "description": "Data per page",
+                        "type": "integer",
+                        "example": 20
+                    },
+                    "current_page": {
+                        "description": "Current page",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "total_page": {
+                        "description": "Total page count",
+                        "type": "integer",
+                        "example": 5
+                    }
+                },
+                "type": "object"
+            },
+            "ApiResponse": {
+                "properties": {
+                    "url": {
+                        "$ref": "#/components/schemas/ResponseUrl"
+                    },
+                    "object": {
+                        "$ref": "#/components/schemas/ResponseObjectType"
+                    }
+                },
+                "type": "object"
+            },
+            "ApiListResponse": {
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "$ref": "#/components/schemas/PaginationInfo"
+                    }
+                ]
+            },
+            "AssignmentRequest": {
+                "required": [
+                    "customers"
+                ],
+                "properties": {
+                    "customers": {
+                        "description": "Customers IDs",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "example": [
+                            "123e4567-e89b-12d3-a456-426614174000"
+                        ]
+                    },
+                    "supervisor": {
+                        "description": "Supervisor ID",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                    },
+                    "contributors": {
+                        "description": "Contributors IDs",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "example": [
+                            "123e4567-e89b-12d3-a456-426614174000"
+                        ]
+                    },
+                    "firm": {
+                        "description": "Firm ID",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateCustomerRequest": {
+                "required": [
+                    "company_number"
+                ],
+                "properties": {
+                    "company_number": {
+                        "description": "The company number",
+                        "type": "string",
+                        "example": "123456789"
+                    },
+                    "supervisor": {
+                        "description": "The supervisor of the customer",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                    },
+                    "contributors": {
+                        "description": "The contributors of the customer",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "example": [
+                            "123e4567-e89b-12d3-a456-426614174000"
+                        ]
+                    },
+                    "firm": {
+                        "description": "The firm of the customer",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                    },
+                    "fiscal_year_end_date": {
+                        "description": "The date of the end of the fiscal year",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2021-12-31"
+                    },
+                    "turnover": {
+                        "description": "The turnover of the customer",
+                        "type": "number",
+                        "example": 100000
+                    },
+                    "bypass_RBE": {
+                        "description": "Bypass RBE",
+                        "type": "boolean",
+                        "default": true,
+                        "example": true
+                    },
+                    "documents_auto_get": {
+                        "description": "Auto get documents",
+                        "type": "boolean",
+                        "default": true,
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateCustomerRequest": {
+                "properties": {
+                    "company_number": {
+                        "description": "Company number (SIREN or SIRET)",
+                        "type": "string",
+                        "example": "123456789"
+                    },
+                    "code": {
+                        "description": "Code",
+                        "type": "string",
+                        "example": "123456789"
+                    },
+                    "name": {
+                        "description": "Name",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "firstname": {
+                        "description": "Firstname",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "lastname": {
+                        "description": "Lastname",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "creation_date": {
+                        "description": "Creation date (Y-m-d)",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2021-12-31"
+                    },
+                    "fiscal_year_end_date": {
+                        "description": "Fiscal year end date (Y-m-d)",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2021-12-31"
+                    },
+                    "turnover": {
+                        "description": "Turnover",
+                        "type": "number",
+                        "example": 100000
+                    },
+                    "contact_email": {
+                        "description": "Contact email",
+                        "type": "string",
+                        "example": "john@kanta.fr"
+                    },
+                    "contact_name": {
+                        "description": "Contact name",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "contact_phone": {
+                        "description": "Contact phone",
+                        "type": "string",
+                        "example": "0123456789"
+                    }
+                },
+                "type": "object"
+            },
+            "FindAllPersonsRequest": {
+                "title": "FindAllPersonsRequest",
+                "description": "Find all persons request schema",
+                "properties": {
+                    "limit": {
+                        "description": "Limit",
+                        "type": "integer",
+                        "default": 20,
+                        "maximum": 100,
+                        "minimum": 1,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UploadPersonDocumentRequest": {
+                "title": "UploadPersonDocumentRequest",
+                "properties": {
+                    "type": {
+                        "description": "Document type",
+                        "type": "string",
+                        "enum": [
+                            "id_card",
+                            "passport",
+                            "driver_license",
+                            "residence_permit"
+                        ],
+                        "example": "id_card"
+                    },
+                    "title": {
+                        "description": "Document title",
+                        "type": "string",
+                        "example": "Carte d'identité"
+                    },
+                    "issue_date": {
+                        "description": "Document issue date",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2021-01-01"
+                    },
+                    "expiration_date": {
+                        "description": "Document expiration date",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2022-01-01"
+                    },
+                    "comment": {
+                        "description": "Document comment",
+                        "type": "string",
+                        "example": "This is a comment"
+                    },
+                    "files[]": {
+                        "description": "Files to upload",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "binary",
+                            "example": "file.pdf"
+                        },
+                        "maxItems": 10
+                    }
+                },
+                "type": "object"
+            },
+            "CreateUserRequest": {
+                "title": "CreateUserRequest",
+                "description": "Create user request",
+                "required": [
+                    "firstname",
+                    "lastname",
+                    "email",
+                    "role"
+                ],
+                "properties": {
+                    "firstname": {
+                        "description": "User firstname",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "lastname": {
+                        "description": "User lastname",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "email": {
+                        "description": "User email",
+                        "type": "string",
+                        "example": "michel@kanta.fr"
+                    },
+                    "role": {
+                        "description": "User role",
+                        "type": "string",
+                        "enum": [
+                            "certified accountant",
+                            "controller",
+                            "collaborator"
+                        ],
+                        "example": "certified accountant"
+                    },
+                    "default_supervisor": {
+                        "description": "User default supervisor",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "00000000-0000-0000-0000-000000000000"
+                    },
+                    "default_contributor": {
+                        "description": "User default contributor",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "00000000-0000-0000-0000-000000000000"
+                    },
+                    "firms": {
+                        "description": "User firms",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "example": [
+                            "00000000-0000-0000-0000-000000000000"
+                        ]
+                    },
+                    "trigram": {
+                        "description": "User trigram",
+                        "type": "string",
+                        "example": "JDO"
+                    }
+                },
+                "type": "object"
+            },
+            "AddressAreaResource": {
+                "title": "Address Area",
+                "properties": {
+                    "label": {
+                        "description": "Address area label",
+                        "type": "string",
+                        "example": "Secret zone"
+                    },
+                    "risk": {
+                        "description": "Risk level of the address area",
+                        "type": "string",
+                        "enum": [
+                            "low",
+                            "medium",
+                            "high",
+                            "not established"
+                        ],
+                        "example": "medium"
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerResource": {
+                "title": "Customer",
+                "properties": {
+                    "id": {
+                        "description": "The customer identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                    },
+                    "legal_type_code": {
+                        "description": "The code corresponding to the legal type",
+                        "type": "number",
+                        "example": 311
+                    },
+                    "legal_type_label": {
+                        "description": "The label corresponding to the legal type",
+                        "type": "string",
+                        "example": "SAS"
+                    },
+                    "code": {
+                        "description": "The code of the customer file",
+                        "type": "string",
+                        "example": "KNT-0001"
+                    },
+                    "company_name": {
+                        "description": "The company name",
+                        "type": "string",
+                        "example": "Kanta"
+                    },
+                    "company_number": {
+                        "description": "The company number. Use SIRET number for France",
+                        "type": "string",
+                        "example": "12345678912345"
+                    },
+                    "company_country": {
+                        "description": "The country of the company",
+                        "type": "string",
+                        "example": "FR"
+                    },
+                    "email": {
+                        "description": "The email of the customer",
+                        "type": "string",
+                        "example": "contact@kanta.fr"
+                    },
+                    "phone": {
+                        "description": "The phone number of the customer",
+                        "type": "string",
+                        "example": "0123456789"
+                    },
+                    "creation_date": {
+                        "description": "The date of creation of the company",
+                        "type": "string",
+                        "example": "2021-01-01"
+                    },
+                    "fiscal_year_end_date": {
+                        "description": "The date of the end of the fiscal year",
+                        "type": "string",
+                        "example": "2021-12-31"
+                    },
+                    "activity_list": {
+                        "description": "The list of activities of the customer",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ActivityResource"
+                        }
+                    },
+                    "address_list": {
+                        "description": "The list of addresses of the customer",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CustomerAddressResource"
+                        }
+                    },
+                    "person_list": {
+                        "description": "The list of persons of the customer",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CustomerPersonResource"
+                        }
+                    },
+                    "mission_list": {
+                        "description": "The list of missions of the customer",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MissionResource"
+                        }
+                    },
+                    "relationship_start_date": {
+                        "description": "The date at which the relationship with the customer started",
+                        "type": "string",
+                        "example": "2021-01-01"
+                    },
+                    "state": {
+                        "description": "The current state of the customer file",
+                        "type": "string",
+                        "enum": [
+                            "draft",
+                            "in_progress",
+                            "valid",
+                            "ended",
+                            "to_validate"
+                        ],
+                        "example": "in_progress"
+                    },
+                    "relationship_end_date": {
+                        "description": "The date at which the relationship with the customer ended",
+                        "type": "string",
+                        "example": "2021-12-31"
+                    },
+                    "accountant_choice_reason": {
+                        "description": "The reason why the customer chose this accountant",
+                        "type": "string",
+                        "example": "Recommendation"
+                    },
+                    "relationship_description": {
+                        "description": "Describes the relationship between the accountant and the customer",
+                        "type": "string",
+                        "example": "Good relationship"
+                    },
+                    "vigilance_level": {
+                        "description": "The vigilance level of the customer",
+                        "type": "string",
+                        "enum": [
+                            "low",
+                            "medium",
+                            "high",
+                            "not_established"
+                        ],
+                        "example": "medium"
+                    },
+                    "risk_summary": {
+                        "description": "The four risks of the customer (localisation, activity, mission, customer) with their level",
+                        "properties": {
+                            "location": {
+                                "description": "The risk level of the location",
+                                "type": "string",
+                                "enum": [
+                                    "low",
+                                    "medium",
+                                    "high",
+                                    "not_established"
+                                ],
+                                "example": "medium"
+                            },
+                            "activity": {
+                                "description": "The risk level of the activity",
+                                "type": "string",
+                                "enum": [
+                                    "low",
+                                    "medium",
+                                    "high",
+                                    "not_established"
+                                ],
+                                "example": "medium"
+                            },
+                            "mission": {
+                                "description": "The risk level of the mission",
+                                "type": "string",
+                                "enum": [
+                                    "low",
+                                    "medium",
+                                    "high",
+                                    "not_established"
+                                ],
+                                "example": "medium"
+                            },
+                            "customer": {
+                                "description": "The risk level of the customer",
+                                "type": "string",
+                                "enum": [
+                                    "low",
+                                    "medium",
+                                    "high",
+                                    "not_established"
+                                ],
+                                "example": "medium"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "diligences": {
+                        "description": "The diligences of the customer",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DiligenceResource"
+                        }
+                    },
+                    "observation": {
+                        "description": "The observations of the accountant",
+                        "type": "string",
+                        "example": "No comment"
+                    },
+                    "turnover": {
+                        "description": "The turnover of the customer",
+                        "type": "number",
+                        "example": 100000
+                    },
+                    "affectation_list": {
+                        "description": "The collaboraters and the validator affected to the customer",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AffectationResource"
+                        }
+                    },
+                    "document_list": {
+                        "description": "The list of documents of the customer",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CustomerDocumentResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ActivityResource": {
+                "title": "Activity",
+                "properties": {
+                    "code": {
+                        "description": "Activity code",
+                        "type": "string",
+                        "example": "6201Z"
+                    },
+                    "label": {
+                        "description": "Activity label",
+                        "type": "string",
+                        "example": "Programmation informatique"
+                    },
+                    "is_main_activity": {
+                        "description": "Is the main activity of the company",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "risk": {
+                        "description": "The risk level of the activity",
+                        "type": "string",
+                        "enum": [
+                            "low",
+                            "medium",
+                            "high",
+                            "not_established"
+                        ],
+                        "example": "medium"
+                    }
+                },
+                "type": "object"
+            },
+            "MissionResource": {
+                "title": "Mission",
+                "properties": {
+                    "label": {
+                        "description": "The label of the mission",
+                        "type": "string",
+                        "example": "Audit"
+                    },
+                    "description": {
+                        "description": "The description of the mission",
+                        "type": "string",
+                        "example": "Audit des comptes annuels"
+                    },
+                    "start_date": {
+                        "description": "The start date of the mission",
+                        "type": "string",
+                        "example": "2021-01-01"
+                    },
+                    "end_date": {
+                        "description": "The end date of the mission",
+                        "type": "string",
+                        "example": "2021-12-31"
+                    },
+                    "risk": {
+                        "description": "The risk level of the mission",
+                        "type": "string",
+                        "enum": [
+                            "low",
+                            "medium",
+                            "high",
+                            "not_established"
+                        ],
+                        "example": "medium"
+                    }
+                },
+                "type": "object"
+            },
+            "AffectationResource": {
+                "title": "Affectation",
+                "properties": {
+                    "id": {
+                        "description": "The object id",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                    },
+                    "object": {
+                        "description": "The object type",
+                        "type": "string",
+                        "example": "User"
+                    },
+                    "first_name": {
+                        "description": "The first name of the user",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "last_name": {
+                        "description": "The last name of the user",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "email": {
+                        "description": "The email of the user",
+                        "type": "string",
+                        "example": "john.doe@mail.com"
+                    },
+                    "is_validator": {
+                        "description": "Is the user a validator",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "is_supervisor": {
+                        "description": "Is the user the supervisor of the customer",
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "DiligenceResource": {
+                "title": "Diligence",
+                "properties": {
+                    "title": {
+                        "description": "The title of the diligence",
+                        "type": "string",
+                        "example": "Contrôle des opérations étrangères"
+                    },
+                    "description": {
+                        "description": "The description of the diligence",
+                        "type": "string",
+                        "example": "Contrôler les opérations qui ont eu lieu avec le pays risqué sur l'exercice"
+                    },
+                    "threat_vulnerability_origin": {
+                        "description": "The origin of the threat or vulnerability",
+                        "type": "string",
+                        "example": "threat"
+                    },
+                    "threat_vulnerability_description": {
+                        "description": "The description of the threat or vulnerability",
+                        "type": "string",
+                        "example": "Le financement du terrorisme"
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerApiResponse": {
+                "title": "Customer",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/CustomerResource"
+                            },
+                            "object": {
+                                "example": "Customer"
+                            },
+                            "url": {
+                                "example": "https://app.kanta.fr/api/v1/customers/4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "CustomersListApiResponse": {
+                "title": "CustomerResourceList",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiListResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "description": "The list of customers",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/CustomerResource"
+                                }
+                            },
+                            "object": {
+                                "example": "List of Customers"
+                            },
+                            "url": {
+                                "example": "https://app.kanta.fr/api/v1/customers"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "CustomersAssignmentApiResponse": {
+                "title": "CustomerResourceList",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "description": "The list of customers",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/CustomerResource"
+                                }
+                            },
+                            "object": {
+                                "example": "List of Customers"
+                            },
+                            "url": {
+                                "example": "https://app.kanta.fr/api/v1/customers/assignment"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "CountryResource": {
+                "title": "Country",
+                "properties": {
+                    "label": {
+                        "description": "Country label",
+                        "type": "string",
+                        "example": "France"
+                    },
+                    "risk": {
+                        "description": "Risk level of the country",
+                        "type": "string",
+                        "enum": [
+                            "low",
+                            "medium",
+                            "high",
+                            "not established"
+                        ],
+                        "example": "medium"
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerAddressResource": {
+                "title": "Address",
+                "properties": {
+                    "street": {
+                        "description": "The street of the address",
+                        "type": "string",
+                        "example": "1 rue de la Paix"
+                    },
+                    "zip_code": {
+                        "description": "The zip code of the address",
+                        "type": "string",
+                        "example": "75000"
+                    },
+                    "city": {
+                        "description": "The city of the address",
+                        "type": "string",
+                        "example": "Paris"
+                    },
+                    "country": {
+                        "description": "The country of the address",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CountryResource"
+                            }
+                        ]
+                    },
+                    "is_headquarter": {
+                        "description": "Is the headquarter",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "address_area": {
+                        "description": "The area of the address",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/AddressAreaResource"
+                            }
+                        ]
+                    },
+                    "additional_information": {
+                        "description": "Additional information of the address",
+                        "type": "string",
+                        "example": "Bâtiment B, 3ème étage"
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerDocumentResource": {
+                "title": "Document",
+                "properties": {
+                    "type": {
+                        "description": "Type of the document",
+                        "type": "string",
+                        "example": "Extrait RBE"
+                    },
+                    "title": {
+                        "description": "Title of the document",
+                        "type": "string",
+                        "example": "Extrait RBE de l'entreprise"
+                    },
+                    "issue_date": {
+                        "description": "Issue date of the document",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2021-01-01"
+                    },
+                    "expiration_date": {
+                        "description": "Expiration date of the document",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2022-01-01"
+                    },
+                    "comment": {
+                        "description": "Comment about the document",
+                        "type": "string",
+                        "example": "This is a comment"
+                    },
+                    "file_list": {
+                        "description": "List of files",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerPersonResource": {
+                "title": "Person",
+                "properties": {
+                    "id": {
+                        "description": "The person identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                    },
+                    "first_name": {
+                        "description": "First name of the person",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "last_name": {
+                        "description": "Last name of the person",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "person_acting_on_behalf": {
+                        "description": "Person acting on behalf",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "beneficial_owner": {
+                        "description": "Beneficial owner",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "legal_representative": {
+                        "description": "Legal representative",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "role": {
+                        "description": "Role of the client",
+                        "type": "string",
+                        "example": "Président"
+                    },
+                    "date_of_birth": {
+                        "description": "Date of birth",
+                        "type": "string",
+                        "example": "1980-01-01"
+                    },
+                    "city_of_birth": {
+                        "description": "City of birth",
+                        "type": "string",
+                        "example": "Paris"
+                    },
+                    "birth_country": {
+                        "description": "Country of birth",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CountryResource"
+                            }
+                        ]
+                    },
+                    "nationality": {
+                        "description": "Nationality of the person",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CountryResource"
+                            }
+                        ]
+                    },
+                    "met_and_certify_identity": {
+                        "description": "Met and certify identity",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "address_list": {
+                        "description": "List of addresses",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonAddressResource"
+                        }
+                    },
+                    "other_activities": {
+                        "description": "Other activities",
+                        "type": "string",
+                        "example": "Consultant"
+                    },
+                    "politically_exposed_person": {
+                        "description": "Is politically exposed person",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "integrity_reputation_doubts": {
+                        "description": "Integrity reputation doubts",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "assets_freeze": {
+                        "description": "Appears in a list regarding assets freeze"
+                    },
+                    "observation": {
+                        "description": "Observation",
+                        "type": "string",
+                        "example": "No comment"
+                    },
+                    "document_list": {
+                        "description": "List of documents",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonDocumentResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "FirmResource": {
+                "title": "Firm",
+                "properties": {
+                    "id": {
+                        "description": "The firm identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "01917032-41d6-7ed3-a6a3-f920b1286d23"
+                    },
+                    "libelle": {
+                        "description": "Label of the firm",
+                        "type": "string",
+                        "example": "Kanta"
+                    },
+                    "is_main": {
+                        "description": "Is true if the firm the main",
+                        "type": "boolean",
+                        "example": "true"
+                    },
+                    "email": {
+                        "description": "Email of the firm",
+                        "type": "string",
+                        "example": "kanta@kanta.fr"
+                    },
+                    "telephone": {
+                        "description": "Telephone of the firm",
+                        "type": "string",
+                        "example": "0123456789"
+                    },
+                    "type_juridique": {
+                        "description": "Type juridique of the firm",
+                        "type": "string",
+                        "example": "SARL"
+                    },
+                    "siret": {
+                        "description": "Siret of the firm",
+                        "type": "string",
+                        "example": "12345678912345"
+                    },
+                    "entite_rattachement": {
+                        "description": "Entite rattachement of the firm",
+                        "type": "string",
+                        "example": "Kanta"
+                    },
+                    "adresse_entite_rattachement": {
+                        "description": "Adresse entite rattachement of the firm",
+                        "type": "string",
+                        "example": "Kanta"
+                    },
+                    "numero_tva": {
+                        "description": "Numero tva of the firm",
+                        "type": "string",
+                        "example": "12345678912345"
+                    },
+                    "adresse": {
+                        "$ref": "#/components/schemas/Adresse"
+                    }
+                },
+                "type": "object"
+            },
+            "Adresse": {
+                "title": "Adresse",
+                "properties": {
+                    "adresse_1": {
+                        "description": "First address line",
+                        "type": "string",
+                        "example": "1 rue de la paix"
+                    },
+                    "adresse_2": {
+                        "description": "Second address line",
+                        "type": "string",
+                        "example": ""
+                    },
+                    "adresse_3": {
+                        "description": "Third address line",
+                        "type": "string",
+                        "example": ""
+                    },
+                    "code_postal": {
+                        "description": "Postal code",
+                        "type": "string",
+                        "example": "75000"
+                    },
+                    "ville": {
+                        "description": "City",
+                        "type": "string",
+                        "example": "Paris"
+                    }
+                },
+                "type": "object"
+            },
+            "FirmApiResponse": {
+                "title": "Firm",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/FirmResource"
+                            },
+                            "object": {
+                                "example": "Firm"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "FirmListApiResponse": {
+                "title": "FirmListApi",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiListResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "description": "The list of firms",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/FirmApiResponse"
+                                }
+                            },
+                            "object": {
+                                "example": "List of Firms"
+                            },
+                            "url": {
+                                "example": "https://app.kanta.fr/api/v1/firms"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "PersonAddressResource": {
+                "title": "Address",
+                "properties": {
+                    "street": {
+                        "description": "The street of the address",
+                        "type": "string",
+                        "example": "1 rue de la Paix"
+                    },
+                    "zip_code": {
+                        "description": "The zip code of the address",
+                        "type": "string",
+                        "example": "75000"
+                    },
+                    "city": {
+                        "description": "The city of the address",
+                        "type": "string",
+                        "example": "Paris"
+                    },
+                    "country": {
+                        "description": "The country of the address",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CountryResource"
+                            }
+                        ]
+                    },
+                    "is_main_residence": {
+                        "description": "Is the main residence",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "address_area": {
+                        "description": "The area of the address",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/AddressAreaResource"
+                            }
+                        ]
+                    },
+                    "additional_information": {
+                        "description": "Additional information of the address",
+                        "type": "string",
+                        "example": "Bâtiment B, 3ème étage"
+                    }
+                },
+                "type": "object"
+            },
+            "PersonDocumentResource": {
+                "title": "Document",
+                "properties": {
+                    "type": {
+                        "description": "Type of the document",
+                        "type": "string",
+                        "example": "id_card"
+                    },
+                    "title": {
+                        "description": "Title of the document",
+                        "type": "string",
+                        "example": "ID card"
+                    },
+                    "issue_date": {
+                        "description": "Issue date of the document",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2021-01-01"
+                    },
+                    "expiration_date": {
+                        "description": "Expiration date of the document",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2022-01-01"
+                    },
+                    "comment": {
+                        "description": "Comment about the document",
+                        "type": "string",
+                        "example": "This is a comment"
+                    },
+                    "file_list": {
+                        "description": "List of files",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                        }
+                    },
+                    "person_id": {
+                        "description": "Person identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                    }
+                },
+                "type": "object"
+            },
+            "Client": {
+                "title": "Client",
+                "properties": {
+                    "id": {
+                        "description": "The client identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "01917032-41d6-7ed3-a6a3-f920b1286d23"
+                    },
+                    "company_name": {
+                        "description": "Company name of the client",
+                        "type": "string",
+                        "example": "Kanta"
+                    },
+                    "file_code": {
+                        "description": "File code of the client",
+                        "type": "string",
+                        "example": "KNT-0001"
+                    },
+                    "person_acting_on_behalf": {
+                        "description": "Person acting on behalf",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "beneficial_owner": {
+                        "description": "Beneficial owner",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "legal_representative": {
+                        "description": "Legal representative",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "role": {
+                        "description": "Role of the client",
+                        "type": "string",
+                        "example": "Président"
+                    }
+                },
+                "type": "object"
+            },
+            "PersonResource": {
+                "title": "Person",
+                "properties": {
+                    "id": {
+                        "description": "The person identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                    },
+                    "first_name": {
+                        "description": "First name of the person",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "last_name": {
+                        "description": "Last name of the person",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "date_of_birth": {
+                        "description": "Date of birth",
+                        "type": "string",
+                        "example": "1980-01-01"
+                    },
+                    "city_of_birth": {
+                        "description": "City of birth",
+                        "type": "string",
+                        "example": "Paris"
+                    },
+                    "birth_country": {
+                        "description": "Country of birth",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CountryResource"
+                            }
+                        ]
+                    },
+                    "nationality": {
+                        "description": "Nationality of the person",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CountryResource"
+                            }
+                        ]
+                    },
+                    "met_and_certify_identity": {
+                        "description": "Met and certify identity",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "address_list": {
+                        "description": "List of addresses",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonAddressResource"
+                        }
+                    },
+                    "other_activities": {
+                        "description": "Other activities",
+                        "type": "string",
+                        "example": "Consultant"
+                    },
+                    "politically_exposed_person": {
+                        "description": "Is politically exposed person",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "integrity_reputation_doubts": {
+                        "description": "Integrity reputation doubts",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "assets_freeze": {
+                        "description": "Appears in a list regarding assets freeze",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "observation": {
+                        "description": "Observation",
+                        "type": "string",
+                        "example": "No comment"
+                    },
+                    "linked_customer_list": {
+                        "description": "List of linked customers",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Client"
+                        }
+                    },
+                    "document_list": {
+                        "description": "List of documents",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonDocumentResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "PersonApiResponse": {
+                "title": "Person",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/PersonResource"
+                            },
+                            "object": {
+                                "example": "Person"
+                            },
+                            "url": {
+                                "example": "https://app.kanta.fr/api/v1/persons/4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "PersonsListApiResponse": {
+                "title": "Person List",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiListResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/PersonResource"
+                                }
+                            },
+                            "object": {
+                                "example": "Person"
+                            },
+                            "url": {
+                                "example": "https://app.kanta.fr/api/v1/persons"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "RiskSummaryResource": {
+                "title": "Risk Summary",
+                "properties": {
+                    "location": {
+                        "description": "Location risk summary",
+                        "type": "object",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LocationRiskSummary"
+                            }
+                        ]
+                    },
+                    "mission": {
+                        "description": "Mission risk summary",
+                        "type": "object",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/MissionRiskSummary"
+                            }
+                        ]
+                    },
+                    "activity": {
+                        "description": "Activity risk summary",
+                        "type": "object",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ActivityRiskSummary"
+                            }
+                        ]
+                    },
+                    "customer": {
+                        "description": "Customer risk summary",
+                        "type": "object",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CustomerRiskSummary"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "LocationRiskSummary": {
+                "title": "Location Risk Summary",
+                "properties": {
+                    "effective_risk": {
+                        "description": "Effective risk level",
+                        "type": "string",
+                        "example": "medium"
+                    },
+                    "facility_list": {
+                        "description": "List of facilities",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FacilityRiskSummary"
+                        }
+                    },
+                    "person_list": {
+                        "description": "List of persons",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonRiskSummary"
+                        }
+                    },
+                    "sensible_operation_list": {
+                        "description": "List of sensible operations",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SensibleOperation"
+                        }
+                    },
+                    "risk_modulation": {
+                        "$ref": "#/components/schemas/RiskModulation"
+                    }
+                },
+                "type": "object"
+            },
+            "MissionRiskSummary": {
+                "title": "Mission Risk Summary",
+                "properties": {
+                    "effective_risk": {
+                        "description": "Effective risk level",
+                        "type": "string",
+                        "example": "medium"
+                    },
+                    "mission_list": {
+                        "description": "List of missions",
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "label": {
+                                    "description": "Label of the mission",
+                                    "type": "string",
+                                    "example": "Mission label"
+                                },
+                                "risk": {
+                                    "description": "Risk level of the mission",
+                                    "type": "string",
+                                    "enum": [
+                                        "low",
+                                        "medium",
+                                        "high",
+                                        "not established"
+                                    ],
+                                    "example": "medium"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "risk_modulation": {
+                        "$ref": "#/components/schemas/RiskModulation"
+                    },
+                    "sensible_operation_list": {
+                        "description": "List of sensible operations",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SensibleOperation"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ActivityRiskSummary": {
+                "title": "Activity Risk Summary",
+                "properties": {
+                    "effective_risk": {
+                        "description": "Effective risk level",
+                        "type": "string",
+                        "example": "medium"
+                    },
+                    "activity_list": {
+                        "description": "List of activities",
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "label": {
+                                    "description": "Label of the activity",
+                                    "type": "string",
+                                    "example": "Activity label"
+                                },
+                                "risk": {
+                                    "description": "Risk level of the activity",
+                                    "type": "string",
+                                    "enum": [
+                                        "low",
+                                        "medium",
+                                        "high",
+                                        "not established"
+                                    ],
+                                    "example": "medium"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "risk_modulation": {
+                        "$ref": "#/components/schemas/RiskModulation"
+                    },
+                    "sensible_operation_list": {
+                        "description": "List of sensible operations",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SensibleOperation"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerRiskSummary": {
+                "title": "Customer Risk Summary",
+                "properties": {
+                    "effective_risk": {
+                        "description": "Effective risk level",
+                        "type": "string",
+                        "example": "medium"
+                    },
+                    "question_list": {
+                        "description": "List of questions",
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "question": {
+                                    "description": "Label of the question",
+                                    "type": "string",
+                                    "example": "Question ?"
+                                },
+                                "answer": {
+                                    "description": "Answer of the question",
+                                    "type": "string",
+                                    "example": "Yes"
+                                },
+                                "risk": {
+                                    "description": "Risk level of the question",
+                                    "type": "string",
+                                    "enum": [
+                                        "low",
+                                        "medium",
+                                        "high",
+                                        "not established"
+                                    ],
+                                    "example": "high"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "person_list": {
+                        "description": "List of persons",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonRiskSummary"
+                        }
+                    },
+                    "sensible_operation_list": {
+                        "description": "List of sensible operations",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SensibleOperation"
+                        }
+                    },
+                    "risk_modulation": {
+                        "$ref": "#/components/schemas/RiskModulation"
+                    }
+                },
+                "type": "object"
+            },
+            "FacilityRiskSummary": {
+                "title": "Facility Risk Summary",
+                "properties": {
+                    "country": {
+                        "description": "Country of the facility",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CountryResource"
+                            }
+                        ]
+                    },
+                    "facility_area": {
+                        "description": "Area of the facility",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/AddressAreaResource"
+                            }
+                        ]
+                    },
+                    "is_headquarter": {
+                        "description": "Is the headquarter",
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "PersonRiskSummary": {
+                "title": "Person Risk Summary",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                    },
+                    "first_name": {
+                        "description": "First name of the person",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "last_name": {
+                        "description": "Last name of the person",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "address_list": {
+                        "description": "List of addresses",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonAddressResource"
+                        }
+                    },
+                    "nationality": {
+                        "description": "Nationality",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CountryResource"
+                            }
+                        ]
+                    },
+                    "birth_country": {
+                        "description": "Country of birth",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/CountryResource"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "SensibleOperation": {
+                "title": "Sensible Operation",
+                "properties": {
+                    "date": {
+                        "description": "Date of the operation",
+                        "type": "string",
+                        "example": "2021-01-01"
+                    },
+                    "title": {
+                        "description": "Title of the operation",
+                        "type": "string",
+                        "example": "Operation title"
+                    },
+                    "amount": {
+                        "description": "Amount of the operation",
+                        "type": "number",
+                        "example": 1000
+                    }
+                },
+                "type": "object"
+            },
+            "RiskModulation": {
+                "title": "Risk Modulation",
+                "properties": {
+                    "risk": {
+                        "description": "Risk level of the modulation",
+                        "type": "string",
+                        "enum": [
+                            "low",
+                            "medium",
+                            "high",
+                            "not established"
+                        ],
+                        "example": "medium"
+                    },
+                    "comment": {
+                        "type": "string",
+                        "example": "Comment of the modulation"
+                    }
+                },
+                "type": "object"
+            },
+            "RiskSummaryApiResponse": {
+                "title": "Risk",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/RiskSummaryResource"
+                            },
+                            "object": {
+                                "example": "Risk_summary"
+                            },
+                            "url": {
+                                "example": "https://app.kanta.fr/api/v1/customers/4c2d5b5e-a8d7-4953-979f-7610616de37c/risk-summary"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "StructureRessource": {
+                "title": "Structure",
+                "properties": {
+                    "name": {
+                        "description": "The name of the structure",
+                        "type": "string",
+                        "example": "My structure"
+                    },
+                    "remaining_customer_files": {
+                        "description": "The number of remaining customer files",
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "remaining_user": {
+                        "description": "The number of remaining user",
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "remaining_validator": {
+                        "description": "The number of remaining validator",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "subscription": {
+                        "description": "The subscription category",
+                        "type": "string",
+                        "example": "Advanced"
+                    },
+                    "subscription_status": {
+                        "description": "The subscription status",
+                        "type": "string",
+                        "example": "active"
+                    }
+                },
+                "type": "object"
+            },
+            "StructureApiResponse": {
+                "title": "Structure",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/StructureRessource"
+                            },
+                            "object": {
+                                "example": "Structure"
+                            },
+                            "url": {
+                                "example": "https://app.kanta.fr/api/v1/structure"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "UserDeletedRessource": {
+                "title": "User",
+                "properties": {
+                    "id": {
+                        "description": "The identifier of the user",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                    },
+                    "deleted": {
+                        "description": "The user is deleted",
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "UserDeletedApiResponse": {
+                "title": "User",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/UserDeletedRessource"
+                            },
+                            "object": {
+                                "example": "User"
+                            },
+                            "url": {
+                                "example": "https://app.kanta.fr/api/v1/users/4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "UserRessource": {
+                "title": "User",
+                "properties": {
+                    "id": {
+                        "description": "The identifier of the user",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "01917032-41d6-7ed3-a6a3-f920b1286d23"
+                    },
+                    "first_name": {
+                        "description": "The first name of the user",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "last_name": {
+                        "description": "The last name of the user",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "email": {
+                        "description": "The email of the user",
+                        "type": "string",
+                        "format": "email",
+                        "example": "contact@kanta.fr"
+                    },
+                    "role": {
+                        "description": "The role of the user",
+                        "type": "string",
+                        "example": "Administrateur"
+                    }
+                },
+                "type": "object"
+            },
+            "UserApiResponse": {
+                "title": "User",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/UserRessource"
+                            },
+                            "object": {
+                                "example": "User"
+                            },
+                            "url": {
+                                "example": "https://app.kanta.fr/api/v1/users/4c2d5b5e-a8d7-4953-979f-7610616de37c"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "UsersListApiResponse": {
+                "title": "User List",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiListResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/UserRessource"
+                                }
+                            },
+                            "object": {
+                                "example": "List of User"
+                            },
+                            "url": {
+                                "example": "https://app.kanta.fr/api/v1/users"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            }
+        },
+        "parameters": {
+            "include_documents": {
+                "name": "include_documents",
+                "in": "query",
+                "description": "Include documents in the report, false return pdf, true return zip with pdf and documents",
+                "schema": {
+                    "type": "boolean"
+                },
+                "example": "false"
+            }
+        },
+        "securitySchemes": {
+            "api_key_security": {
+                "type": "apiKey",
+                "description": "API Key Authentication, for obtaining the key, go in interface app.kanta.fr \"Gestion du cabinet\" and \"Clés API\".",
+                "name": "X-API-Key",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Users",
+            "description": "User related operations"
+        },
+        {
+            "name": "Customers",
+            "description": "Customer related operations"
+        },
+        {
+            "name": "Structures",
+            "description": "Structure related operations"
+        },
+        {
+            "name": "Files",
+            "description": "Files"
+        },
+        {
+            "name": "Firms",
+            "description": "Firms"
+        },
+        {
+            "name": "Persons",
+            "description": "Persons"
+        }
+    ],
+    "security": [
+        {
+            "api_key_security": [
+                "read",
+                "write"
+            ]
+        }
+    ]
+}
