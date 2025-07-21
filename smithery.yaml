@@ -1,0 +1,31 @@
+# Smithery configuration file: https://smithery.ai/docs/build/project-config
+
+startCommand:
+  type: stdio
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({
+      command: 'node',
+      args: ['dist/index.js'],
+      env: {
+        KANTA_API_KEY: config.apiKey,
+        ...(config.apiUrl ? { KANTA_API_URL: config.apiUrl } : {}),
+      },
+    })
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - apiKey
+    properties:
+      apiKey:
+        type: string
+        description: The Kanta API key (X-API-Key header)
+      apiUrl:
+        type: string
+        description: Optional base URL for the Kanta API (defaults to
+          https://app.kanta.fr/api/v1)
+  exampleConfig:
+    apiKey: sk_test_1234567890abcdef
+    apiUrl: https://app.kanta.fr/api/v1
