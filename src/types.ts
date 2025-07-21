@@ -215,9 +215,9 @@ export const FirmResourceSchema = z.object({
 // Structure schema
 export const StructureResourceSchema = z.object({
   name: z.string(),
-  remaining_customer_files: z.number(),
-  remaining_user: z.number(),
-  remaining_validator: z.number(),
+  remaining_customer_files: z.number().nullable(),
+  remaining_user: z.number().nullable(),
+  remaining_validator: z.number().nullable(),
   subscription: z.string(),
   subscription_status: z.string(),
 });
@@ -315,7 +315,7 @@ export const FirmApiResponseSchema = ApiResponseSchema.extend({
 });
 
 export const FirmListApiResponseSchema = ApiListResponseSchema.extend({
-  data: z.array(FirmApiResponseSchema),
+  data: z.array(FirmResourceSchema),
 });
 
 export const StructureApiResponseSchema = ApiResponseSchema.extend({
