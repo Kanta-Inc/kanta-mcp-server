@@ -271,8 +271,17 @@ export async function handleCustomerTool(
 ): Promise<any> {
   switch (name) {
     case 'get_customers': {
-      const params = args as { per_page?: number; page?: number };
-      return await client.getCustomers(params);
+      const params = z.object({
+        per_page: z.number().min(1).max(100).optional(),
+        page: z.number().min(1).optional(),
+      }).parse(args);
+      
+      // Filter out undefined values
+      const filteredParams = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => value !== undefined)
+      ) as { per_page?: number; page?: number };
+      
+      return await client.getCustomers(filteredParams);
     }
     
     case 'get_customer': {

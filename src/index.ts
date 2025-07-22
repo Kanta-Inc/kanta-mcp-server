@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import 'dotenv/config';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -8,6 +9,7 @@ import {
   ErrorCode,
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
+import { z } from 'zod';
 
 import { KantaClient } from './kanta-client.js';
 import { createCustomerTools, handleCustomerTool } from './tools/customers.js';
@@ -18,6 +20,7 @@ import { createMiscTools, handleMiscTool } from './tools/misc.js';
 class KantaMCPServer {
   private server: Server;
   private kantaClient: KantaClient;
+  private isShuttingDown: boolean = false;
 
   constructor() {
     this.server = new Server(
@@ -73,6 +76,11 @@ class KantaMCPServer {
     });
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+      // Check if server is shutting down
+      if (this.isShuttingDown) {
+        throw new McpError(ErrorCode.InternalError, 'Server is shutting down');
+      }
+
       const { name, arguments: args } = request.params;
 
       try {
@@ -121,20 +129,49 @@ class KantaMCPServer {
           ],
         };
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-        
         // Log l'erreur pour le débogage
         console.error(`Erreur lors de l'exécution de l'outil ${name}:`, error);
 
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `Erreur lors de l'exécution de l'outil ${name}: ${errorMessage}`,
-            },
-          ],
-          isError: true,
-        };
+        // Re-throw MCP errors directly
+        if (error instanceof McpError) {
+          throw error;
+        }
+
+        // Handle Zod validation errors
+        if (error instanceof z.ZodError) {
+          const issues = error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).join(', ');
+          throw new McpError(ErrorCode.InvalidParams, `Erreurs de validation: ${issues}`);
+        }
+
+        // Handle different error types with appropriate MCP error codes
+        if (error instanceof Error) {
+          // Check for common API error patterns
+          if (error.message.includes('HTTP 400') || error.message.includes('Bad Request')) {
+            throw new McpError(ErrorCode.InvalidParams, `Paramètres invalides: ${error.message}`);
+          }
+          
+          if (error.message.includes('HTTP 401') || error.message.includes('Unauthorized')) {
+            throw new McpError(ErrorCode.InvalidRequest, `Non autorisé: Vérifiez votre clé API`);
+          }
+          
+          if (error.message.includes('HTTP 403') || error.message.includes('Forbidden')) {
+            throw new McpError(ErrorCode.InvalidRequest, `Accès refusé: ${error.message}`);
+          }
+          
+          if (error.message.includes('HTTP 404') || error.message.includes('Not Found')) {
+            throw new McpError(ErrorCode.InvalidRequest, `Ressource non trouvée: ${error.message}`);
+          }
+          
+          if (error.message.includes('timeout') || error.message.includes('TIMEOUT')) {
+            throw new McpError(ErrorCode.InternalError, `Timeout de requête: ${error.message}`);
+          }
+          
+          // Generic error fallback
+          throw new McpError(ErrorCode.InternalError, `Erreur lors de l'exécution: ${error.message}`);
+        }
+
+        // Unknown error type
+        throw new McpError(ErrorCode.InternalError, `Erreur inconnue lors de l'exécution de l'outil ${name}`);
       }
     });
   }
@@ -146,13 +183,29 @@ class KantaMCPServer {
     // Log de démarrage
     console.error('Serveur MCP Kanta démarré et connecté via stdio');
   }
+
+  async shutdown(): Promise<void> {
+    this.isShuttingDown = true;
+    console.error('Arrêt en cours du serveur MCP Kanta...');
+    
+    try {
+      await this.server.close();
+      console.error('Serveur MCP Kanta arrêté avec succès');
+    } catch (error) {
+      console.error('Erreur lors de l\'arrêt du serveur:', error);
+      throw error;
+    }
+  }
 }
+
+// Global server instance for graceful shutdown
+let serverInstance: KantaMCPServer | null = null;
 
 // Point d'entrée principal
 async function main(): Promise<void> {
   try {
-    const server = new KantaMCPServer();
-    await server.run();
+    serverInstance = new KantaMCPServer();
+    await serverInstance.run();
   } catch (error) {
     console.error('Erreur fatale lors du démarrage du serveur:', error);
     process.exit(1);
@@ -160,14 +213,42 @@ async function main(): Promise<void> {
 }
 
 // Gestion gracieuse de l'arrêt
-process.on('SIGINT', () => {
-  console.error('Signal SIGINT reçu, arrêt du serveur...');
-  process.exit(0);
+async function gracefulShutdown(signal: string): Promise<void> {
+  console.error(`Signal ${signal} reçu, arrêt gracieux du serveur...`);
+  
+  if (serverInstance) {
+    try {
+      await serverInstance.shutdown();
+      process.exit(0);
+    } catch (error) {
+      console.error('Erreur lors de l\'arrêt gracieux:', error);
+      process.exit(1);
+    }
+  } else {
+    process.exit(0);
+  }
+}
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Exception non gérée:', error);
+  if (serverInstance) {
+    serverInstance.shutdown().finally(() => process.exit(1));
+  } else {
+    process.exit(1);
+  }
 });
 
-process.on('SIGTERM', () => {
-  console.error('Signal SIGTERM reçu, arrêt du serveur...');
-  process.exit(0);
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Promesse rejetée non gérée à:', promise, 'raison:', reason);
+  if (serverInstance) {
+    serverInstance.shutdown().finally(() => process.exit(1));
+  } else {
+    process.exit(1);
+  }
 });
 
 // Démarrer le serveur si ce fichier est exécuté directement

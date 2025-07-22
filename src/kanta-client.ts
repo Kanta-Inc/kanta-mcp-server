@@ -24,15 +24,18 @@ import {
 export interface KantaClientOptions {
   apiKey: string;
   baseUrl?: string;
+  timeout?: number;
 }
 
 export class KantaClient {
   private apiKey: string;
   private baseUrl: string;
+  private timeout: number;
 
   constructor(options: KantaClientOptions) {
     this.apiKey = options.apiKey;
     this.baseUrl = options.baseUrl || 'https://app.kanta.fr/api/v1';
+    this.timeout = options.timeout || 30000; // 30 seconds default
   }
 
   private async makeRequest<T>(
@@ -45,30 +48,50 @@ export class KantaClient {
   ): Promise<T> {
     const { method = 'GET', body, schema } = options;
     
-    const headers: Record<string, string> = {
-      'X-API-Key': this.apiKey,
-      'Content-Type': 'application/json',
-    };
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    
+    try {
+      const headers: Record<string, string> = {
+        'X-API-Key': this.apiKey,
+        'Content-Type': 'application/json',
+      };
 
-    const config: RequestInit = {
-      method,
-      headers,
-    };
+      const config: RequestInit = {
+        method,
+        headers,
+        signal: controller.signal,
+      };
 
-    if (body && method !== 'GET') {
-      config.body = JSON.stringify(body);
+      if (body && method !== 'GET') {
+        config.body = JSON.stringify(body);
+      }
+
+      const url = `${this.baseUrl}${endpoint}`;
+      const response = await fetch(url, config);
+
+      // Clear timeout on successful response
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      return schema.parse(data);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      // Handle abort/timeout error
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error(`Request timeout after ${this.timeout}ms`);
+      }
+      
+      // Re-throw other errors
+      throw error;
     }
-
-    const url = `${this.baseUrl}${endpoint}`;
-    const response = await fetch(url, config);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
-    }
-
-    const data = await response.json();
-    return schema.parse(data);
   }
 
   // Customers endpoints
