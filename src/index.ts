@@ -37,12 +37,7 @@ class KantaMCPServer {
 
     // Vérifier que la clé API est fournie
     const apiKey = process.env.KANTA_API_KEY;
-    
-    // Debug: afficher les variables d'environnement disponibles
-    console.error('Variables d\'environnement disponibles:', Object.keys(process.env).filter(k => k.includes('KANTA')));
-    console.error('KANTA_API_KEY trouvée:', apiKey ? 'OUI' : 'NON');
-    console.error('Longueur de la clé:', apiKey ? apiKey.length : 0);
-    
+
     if (!apiKey) {
       throw new Error(
         'KANTA_API_KEY environment variable is required. ' +
@@ -87,31 +82,31 @@ class KantaMCPServer {
         let result;
 
         // Router vers le bon handler basé sur le nom de l'outil
-        if (name.startsWith('get_customers') || 
-            name.startsWith('get_customer') || 
-            name.startsWith('create_customer') || 
-            name.startsWith('update_customer') || 
-            name.startsWith('search_customers') || 
-            name.startsWith('assign_customers') || 
-            name.includes('customer')) {
+        if (name.startsWith('get_customers') ||
+          name.startsWith('get_customer') ||
+          name.startsWith('create_customer') ||
+          name.startsWith('update_customer') ||
+          name.startsWith('search_customers') ||
+          name.startsWith('assign_customers') ||
+          name.includes('customer')) {
           result = await handleCustomerTool(this.kantaClient, name, args);
-        } else if (name.startsWith('get_users') || 
-                   name.startsWith('get_user') || 
-                   name.startsWith('create_user') || 
-                   name.startsWith('delete_user') || 
-                   name.includes('user')) {
+        } else if (name.startsWith('get_users') ||
+          name.startsWith('get_user') ||
+          name.startsWith('create_user') ||
+          name.startsWith('delete_user') ||
+          name.includes('user')) {
           result = await handleUserTool(this.kantaClient, name, args);
-        } else if (name.startsWith('get_persons') || 
-                   name.startsWith('get_person') || 
-                   name.startsWith('upload_person') || 
-                   name.includes('person')) {
+        } else if (name.startsWith('get_persons') ||
+          name.startsWith('get_person') ||
+          name.startsWith('upload_person') ||
+          name.includes('person')) {
           result = await handlePersonTool(this.kantaClient, name, args);
-        } else if (name.startsWith('get_firms') || 
-                   name.startsWith('get_structure') || 
-                   name.startsWith('download_file') || 
-                   name.includes('firm') || 
-                   name.includes('structure') || 
-                   name.includes('file')) {
+        } else if (name.startsWith('get_firms') ||
+          name.startsWith('get_structure') ||
+          name.startsWith('download_file') ||
+          name.includes('firm') ||
+          name.includes('structure') ||
+          name.includes('file')) {
           result = await handleMiscTool(this.kantaClient, name, args);
         } else {
           throw new McpError(
@@ -149,23 +144,23 @@ class KantaMCPServer {
           if (error.message.includes('HTTP 400') || error.message.includes('Bad Request')) {
             throw new McpError(ErrorCode.InvalidParams, `Paramètres invalides: ${error.message}`);
           }
-          
+
           if (error.message.includes('HTTP 401') || error.message.includes('Unauthorized')) {
             throw new McpError(ErrorCode.InvalidRequest, `Non autorisé: Vérifiez votre clé API`);
           }
-          
+
           if (error.message.includes('HTTP 403') || error.message.includes('Forbidden')) {
             throw new McpError(ErrorCode.InvalidRequest, `Accès refusé: ${error.message}`);
           }
-          
+
           if (error.message.includes('HTTP 404') || error.message.includes('Not Found')) {
             throw new McpError(ErrorCode.InvalidRequest, `Ressource non trouvée: ${error.message}`);
           }
-          
+
           if (error.message.includes('timeout') || error.message.includes('TIMEOUT')) {
             throw new McpError(ErrorCode.InternalError, `Timeout de requête: ${error.message}`);
           }
-          
+
           // Generic error fallback
           throw new McpError(ErrorCode.InternalError, `Erreur lors de l'exécution: ${error.message}`);
         }
@@ -179,7 +174,7 @@ class KantaMCPServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    
+
     // Log de démarrage
     console.error('Serveur MCP Kanta démarré et connecté via stdio');
   }
@@ -187,7 +182,7 @@ class KantaMCPServer {
   async shutdown(): Promise<void> {
     this.isShuttingDown = true;
     console.error('Arrêt en cours du serveur MCP Kanta...');
-    
+
     try {
       await this.server.close();
       console.error('Serveur MCP Kanta arrêté avec succès');
@@ -215,7 +210,7 @@ async function main(): Promise<void> {
 // Gestion gracieuse de l'arrêt
 async function gracefulShutdown(signal: string): Promise<void> {
   console.error(`Signal ${signal} reçu, arrêt gracieux du serveur...`);
-  
+
   if (serverInstance) {
     try {
       await serverInstance.shutdown();
