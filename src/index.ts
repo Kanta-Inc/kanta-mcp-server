@@ -6,6 +6,8 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
   ErrorCode,
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
@@ -31,6 +33,7 @@ class KantaMCPServer {
       {
         capabilities: {
           tools: {},
+          resources: {},
         },
       }
     );
@@ -68,6 +71,218 @@ class KantaMCPServer {
           ...miscTools,
         ],
       };
+    });
+
+    this.server.setRequestHandler(ListResourcesRequestSchema, async () => {
+      return {
+        resources: [
+          {
+            uri: 'kanta://structure/organization',
+            name: 'Structure organisationnelle',
+            description: 'Informations sur les cabinets, utilisateurs et structure organisationnelle',
+            mimeType: 'application/json',
+          },
+          {
+            uri: 'kanta://risk-summaries',
+            name: 'Résumés de risques clients',
+            description: 'Liste des résumés de risques pour tous les clients',
+            mimeType: 'application/json',
+          },
+          {
+            uri: 'kanta://customers/summary',
+            name: 'Résumé des clients',
+            description: 'Vue d\'ensemble de tous les clients avec informations essentielles',
+            mimeType: 'application/json',
+          },
+          {
+            uri: 'kanta://customer/{customer_id}/risk-summary',
+            name: 'Résumé de risque client',
+            description: 'Résumé de risque pour un client spécifique (remplacer {customer_id} par l\'ID du client)',
+            mimeType: 'application/json',
+          },
+          {
+            uri: 'kanta://files/{file_id}',
+            name: 'Fichier Kanta',
+            description: 'Accès à un fichier spécifique par son ID (remplacer {file_id} par l\'ID du fichier)',
+            mimeType: 'application/octet-stream',
+          }
+        ],
+      };
+    });
+
+    this.server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+      const { uri } = request.params;
+
+      try {
+        if (uri === 'kanta://structure/organization') {
+          // Récupérer les informations de structure
+          const [firms, users] = await Promise.all([
+            this.kantaClient.getFirms(),
+            this.kantaClient.getUsers().catch(() => ({ data: [] })) // En cas d'erreur, retourner liste vide
+          ]);
+
+          return {
+            contents: [
+              {
+                uri: uri,
+                mimeType: 'application/json',
+                text: JSON.stringify({
+                  firms: firms.data,
+                  users: users.data,
+                  last_updated: new Date().toISOString()
+                }, null, 2),
+              },
+            ],
+          };
+        }
+
+        if (uri === 'kanta://customers/summary') {
+          // Récupérer un résumé des clients
+          const customers = await this.kantaClient.getCustomers({ per_page: 100 });
+
+          const summary = customers.data.map(customer => ({
+            id: customer.id,
+            company_name: customer.company_name,
+            state: customer.state,
+            vigilance_level: customer.vigilance_level,
+            code: customer.code,
+            creation_date: customer.creation_date,
+            risk_summary: customer.risk_summary
+          }));
+
+          return {
+            contents: [
+              {
+                uri: uri,
+                mimeType: 'application/json',
+                text: JSON.stringify({
+                  total_customers: customers.total_data,
+                  customers: summary,
+                  last_updated: new Date().toISOString()
+                }, null, 2),
+              },
+            ],
+          };
+        }
+
+        if (uri === 'kanta://risk-summaries') {
+          // Récupérer les clients et leurs risk summaries
+          const customers = await this.kantaClient.getCustomers({ per_page: 50 });
+          
+          const riskSummaries = await Promise.allSettled(
+            customers.data.map(async (customer) => {
+              try {
+                const riskSummary = await this.kantaClient.getCustomerRiskSummary(customer.id);
+                return {
+                  customer_id: customer.id,
+                  company_name: customer.company_name,
+                  vigilance_level: customer.vigilance_level,
+                  risk_summary: riskSummary
+                };
+              } catch (error) {
+                return {
+                  customer_id: customer.id,
+                  company_name: customer.company_name,
+                  vigilance_level: customer.vigilance_level,
+                  error: 'Unable to fetch risk summary'
+                };
+              }
+            })
+          );
+
+          const successfulSummaries = riskSummaries
+            .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
+            .map(result => result.value);
+
+          return {
+            contents: [
+              {
+                uri: uri,
+                mimeType: 'application/json',
+                text: JSON.stringify({
+                  total_summaries: successfulSummaries.length,
+                  risk_summaries: successfulSummaries,
+                  last_updated: new Date().toISOString()
+                }, null, 2),
+              },
+            ],
+          };
+        }
+
+        // Handle dynamic URIs for individual customer risk summaries
+        const customerRiskMatch = uri.match(/^kanta:\/\/customer\/([^\/]+)\/risk-summary$/);
+        if (customerRiskMatch && customerRiskMatch[1]) {
+          const customerId = customerRiskMatch[1];
+          
+          // Validate UUID format
+          if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(customerId)) {
+            throw new McpError(ErrorCode.InvalidParams, `ID client invalide: ${customerId}`);
+          }
+
+          const riskSummary = await this.kantaClient.getCustomerRiskSummary(customerId);
+          const customer = await this.kantaClient.getCustomer(customerId);
+
+          return {
+            contents: [
+              {
+                uri: uri,
+                mimeType: 'application/json',
+                text: JSON.stringify({
+                  customer: {
+                    id: customer.id,
+                    company_name: customer.company_name,
+                    vigilance_level: customer.vigilance_level,
+                    state: customer.state,
+                  },
+                  risk_summary: riskSummary,
+                  last_updated: new Date().toISOString()
+                }, null, 2),
+              },
+            ],
+          };
+        }
+
+        // Handle dynamic URIs for files
+        const fileMatch = uri.match(/^kanta:\/\/files\/([^\/]+)$/);
+        if (fileMatch && fileMatch[1]) {
+          const fileId = fileMatch[1];
+          
+          // Note: File download returns binary data which would need special handling
+          // For now, we return metadata about the file access
+          return {
+            contents: [
+              {
+                uri: uri,
+                mimeType: 'application/json',
+                text: JSON.stringify({
+                  message: `File access for ID: ${fileId}`,
+                  note: 'File binary download is handled via tools, not resources',
+                  available_tool: 'download_file',
+                  last_updated: new Date().toISOString()
+                }, null, 2),
+              },
+            ],
+          };
+        }
+
+        throw new McpError(ErrorCode.InvalidRequest, `Resource non trouvée: ${uri}`);
+      } catch (error) {
+        console.error(`Erreur lors de la lecture de la ressource ${uri}:`, error);
+
+        if (error instanceof McpError) {
+          throw error;
+        }
+
+        if (error instanceof z.ZodError) {
+          throw new McpError(ErrorCode.InternalError, `Erreur de validation pour la ressource: ${error.message}`);
+        }
+
+        if (error instanceof Error) {
+          throw new McpError(ErrorCode.InternalError, `Erreur lors de la lecture de la ressource: ${error.message}`);
+        }
+
+        throw new McpError(ErrorCode.InternalError, `Erreur inconnue lors de la lecture de la ressource ${uri}`);
+      }
     });
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
