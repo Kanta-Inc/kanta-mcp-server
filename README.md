@@ -60,17 +60,19 @@ cd kanta-mcp-server
 npm install
 ```
 
-3. Compiler le TypeScript :
+3. Construire le serveur pour Smithery :
 ```bash
 npm run build
 ```
 
 ## Configuration
 
-### Variables d'environnement requises
+### Configuration Smithery
 
-- `KANTA_API_KEY` : Votre clé API Kanta (obligatoire)
-- `KANTA_API_URL` : URL de base de l'API (optionnel, défaut: https://app.kanta.fr/api/v1)
+Le serveur est configuré via Smithery avec les paramètres suivants :
+
+- `apiKey` : Votre clé API Kanta (obligatoire)
+- `apiUrl` : URL de base de l'API (optionnel, défaut: https://app.kanta.fr/api/v1)
 
 ### Obtention de la clé API
 
@@ -85,39 +87,31 @@ Pour obtenir votre clé API Kanta :
 ### Lancement du serveur
 
 ```bash
-# Avec npm
-KANTA_API_KEY=your_api_key npm start
+# Lancement du serveur construit
+npm start
 
-# Ou avec tsx pour le développement
-KANTA_API_KEY=your_api_key npm run dev
+# Mode développement avec Smithery
+npm run dev
 ```
 
 ### Configuration MCP
 
-Ajoutez cette configuration à votre client MCP (comme Claude Desktop) :
+Pour utiliser avec Claude Desktop, installez via Smithery :
 
-```json
-{
-  "mcpServers": {
-    "kanta": {
-      "command": "node",
-      "args": ["/chemin/vers/kanta-mcp-server/dist/index.js"],
-      "env": {
-        "KANTA_API_KEY": "votre_cle_api_ici"
-      }
-    }
-  }
-}
+```bash
+npx -y @smithery/cli install @Kanta-Inc/kanta-mcp-server --client claude
 ```
+
+La configuration de l'API key se fait via l'interface Smithery lors de l'installation.
 
 ## Développement
 
 ### Scripts disponibles
 
-- `npm run build` : Compile le TypeScript
-- `npm start` : Lance le serveur compilé
-- `npm run dev` : Lance en mode développement avec tsx
-- `npm run watch` : Lance en mode watch pour le développement
+- `npm run build` : Construit le serveur pour le déploiement Smithery
+- `npm start` : Lance le serveur construit localement
+- `npm run dev` : Lance en mode développement avec Smithery CLI
+- `npm run watch` : Lance en mode watch avec tsx
 
 ### Structure du projet
 
