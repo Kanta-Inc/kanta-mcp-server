@@ -25,8 +25,8 @@ COPY package.json package-lock.json ./
 # Install only production dependencies
 RUN npm install --production
 
-# Copy compiled output
-COPY --from=builder /app/dist ./dist
+# Copy Smithery HTTP build output
+COPY --from=builder /app/.smithery ./.smithery
 
-# Default command to run the server
-ENTRYPOINT ["node", "dist/index.js"]
+# Default command to run the server (Smithery HTTP transport)
+ENTRYPOINT ["node", ".smithery/index.cjs"]
