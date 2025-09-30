@@ -1,108 +1,49 @@
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import { KantaClient } from '../kanta-client.js';
 import { CreateUserRequestSchema } from '../types.js';
 
-export function createUserTools(client: KantaClient): Tool[] {
+export interface McpTool {
+  name: string;
+  description: string;
+  inputSchema?: Record<string, z.ZodType<any>>;
+}
+
+export function createUserTools(client: KantaClient): McpTool[] {
   return [
     {
       name: 'get_users',
       description: 'Récupère la liste des utilisateurs avec pagination optionnelle',
       inputSchema: {
-        type: 'object',
-        properties: {
-          per_page: {
-            type: 'number',
-            description: 'Nombre d\'éléments par page (1-100)',
-            minimum: 1,
-            maximum: 100,
-          },
-          page: {
-            type: 'number',
-            description: 'Numéro de page',
-            minimum: 1,
-          },
-        },
+        per_page: z.number().min(1).max(100).optional().describe('Nombre d\'éléments par page (1-100)'),
+        page: z.number().min(1).optional().describe('Numéro de page'),
       },
     },
     {
       name: 'get_user',
       description: 'Récupère les détails d\'un utilisateur spécifique par son ID',
       inputSchema: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID UUID de l\'utilisateur',
-          },
-        },
-        required: ['id'],
+        id: z.string().uuid().describe('ID UUID de l\'utilisateur'),
       },
     },
     {
       name: 'create_user',
       description: 'Crée un nouvel utilisateur',
       inputSchema: {
-        type: 'object',
-        properties: {
-          firstname: {
-            type: 'string',
-            description: 'Prénom de l\'utilisateur',
-          },
-          lastname: {
-            type: 'string',
-            description: 'Nom de famille de l\'utilisateur',
-          },
-          email: {
-            type: 'string',
-            format: 'email',
-            description: 'Email de l\'utilisateur',
-          },
-          role: {
-            type: 'string',
-            enum: ['certified accountant', 'controller', 'collaborator'],
-            description: 'Rôle de l\'utilisateur',
-          },
-          default_supervisor: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID du superviseur par défaut',
-          },
-          default_contributor: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID du contributeur par défaut',
-          },
-          firms: {
-            type: 'array',
-            items: {
-              type: 'string',
-              format: 'uuid',
-            },
-            description: 'Liste des IDs des cabinets de l\'utilisateur',
-          },
-          trigram: {
-            type: 'string',
-            description: 'Trigramme de l\'utilisateur',
-          },
-        },
-        required: ['firstname', 'lastname', 'email', 'role'],
+        firstname: z.string().describe('Prénom de l\'utilisateur'),
+        lastname: z.string().describe('Nom de famille de l\'utilisateur'),
+        email: z.string().email().describe('Email de l\'utilisateur'),
+        role: z.enum(['certified accountant', 'controller', 'collaborator']).describe('Rôle de l\'utilisateur'),
+        default_supervisor: z.string().uuid().optional().describe('ID du superviseur par défaut'),
+        default_contributor: z.string().uuid().optional().describe('ID du contributeur par défaut'),
+        firms: z.array(z.string().uuid()).optional().describe('Liste des IDs des cabinets de l\'utilisateur'),
+        trigram: z.string().optional().describe('Trigramme de l\'utilisateur'),
       },
     },
     {
       name: 'delete_user',
       description: 'Supprime un utilisateur',
       inputSchema: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID UUID de l\'utilisateur à supprimer',
-          },
-        },
-        required: ['id'],
+        id: z.string().uuid().describe('ID UUID de l\'utilisateur à supprimer'),
       },
     },
   ];

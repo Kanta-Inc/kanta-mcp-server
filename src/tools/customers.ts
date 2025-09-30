@@ -1,4 +1,3 @@
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import { KantaClient } from '../kanta-client.js';
 import {
@@ -7,238 +6,87 @@ import {
   AssignmentRequestSchema,
 } from '../types.js';
 
-export function createCustomerTools(client: KantaClient): Tool[] {
+export interface McpTool {
+  name: string;
+  description: string;
+  inputSchema?: Record<string, z.ZodType<any>>;
+}
+
+export function createCustomerTools(client: KantaClient): McpTool[] {
   return [
     {
       name: 'get_customers',
       description: 'Récupère la liste des clients avec pagination optionnelle',
       inputSchema: {
-        type: 'object',
-        properties: {
-          per_page: {
-            type: 'number',
-            description: 'Nombre d\'éléments par page (1-100)',
-            minimum: 1,
-            maximum: 100,
-          },
-          page: {
-            type: 'number',
-            description: 'Numéro de page',
-            minimum: 1,
-          },
-        },
+        per_page: z.number().min(1).max(100).optional().describe('Nombre d\'éléments par page (1-100)'),
+        page: z.number().min(1).optional().describe('Numéro de page'),
       },
     },
     {
       name: 'get_customer',
       description: 'Récupère les détails d\'un client spécifique par son ID',
       inputSchema: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID UUID du client',
-          },
-        },
-        required: ['id'],
+        id: z.string().uuid().describe('ID UUID du client'),
       },
     },
     {
       name: 'create_customer',
       description: 'Crée un nouveau client avec son numéro d\'entreprise (SIREN/SIRET)',
       inputSchema: {
-        type: 'object',
-        properties: {
-          company_number: {
-            type: 'string',
-            description: 'Numéro d\'entreprise (SIREN ou SIRET)',
-          },
-          supervisor: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID du superviseur',
-          },
-          contributors: {
-            type: 'array',
-            items: {
-              type: 'string',
-              format: 'uuid',
-            },
-            description: 'Liste des IDs des contributeurs',
-          },
-          firm: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID du cabinet',
-          },
-          fiscal_year_end_date: {
-            type: 'string',
-            format: 'date',
-            description: 'Date de fin d\'exercice fiscal (YYYY-MM-DD)',
-          },
-          turnover: {
-            type: 'number',
-            description: 'Chiffre d\'affaires',
-          },
-          bypass_RBE: {
-            type: 'boolean',
-            description: 'Contourner RBE',
-            default: true,
-          },
-          documents_auto_get: {
-            type: 'boolean',
-            description: 'Récupération automatique des documents',
-            default: true,
-          },
-        },
-        required: ['company_number'],
+        company_number: z.string().describe('Numéro d\'entreprise (SIREN ou SIRET)'),
+        supervisor: z.string().uuid().optional().describe('ID du superviseur'),
+        contributors: z.array(z.string().uuid()).optional().describe('Liste des IDs des contributeurs'),
+        firm: z.string().uuid().optional().describe('ID du cabinet'),
+        fiscal_year_end_date: z.string().optional().describe('Date de fin d\'exercice fiscal (YYYY-MM-DD)'),
+        turnover: z.number().optional().describe('Chiffre d\'affaires'),
+        bypass_RBE: z.boolean().optional().describe('Contourner RBE'),
+        documents_auto_get: z.boolean().optional().describe('Récupération automatique des documents'),
       },
     },
     {
       name: 'update_customer',
       description: 'Met à jour les informations d\'un client existant',
       inputSchema: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID UUID du client à mettre à jour',
-          },
-          company_number: {
-            type: 'string',
-            description: 'Numéro d\'entreprise (SIREN ou SIRET)',
-          },
-          code: {
-            type: 'string',
-            description: 'Code client',
-          },
-          name: {
-            type: 'string',
-            description: 'Nom',
-          },
-          firstname: {
-            type: 'string',
-            description: 'Prénom',
-          },
-          lastname: {
-            type: 'string',
-            description: 'Nom de famille',
-          },
-          creation_date: {
-            type: 'string',
-            format: 'date',
-            description: 'Date de création (YYYY-MM-DD)',
-          },
-          fiscal_year_end_date: {
-            type: 'string',
-            format: 'date',
-            description: 'Date de fin d\'exercice fiscal (YYYY-MM-DD)',
-          },
-          turnover: {
-            type: 'number',
-            description: 'Chiffre d\'affaires',
-          },
-          contact_email: {
-            type: 'string',
-            format: 'email',
-            description: 'Email de contact',
-          },
-          contact_name: {
-            type: 'string',
-            description: 'Nom du contact',
-          },
-          contact_phone: {
-            type: 'string',
-            description: 'Téléphone du contact',
-          },
-        },
-        required: ['id'],
+        id: z.string().uuid().describe('ID UUID du client à mettre à jour'),
+        company_number: z.string().optional().describe('Numéro d\'entreprise (SIREN ou SIRET)'),
+        code: z.string().optional().describe('Code client'),
+        name: z.string().optional().describe('Nom'),
+        firstname: z.string().optional().describe('Prénom'),
+        lastname: z.string().optional().describe('Nom de famille'),
+        creation_date: z.string().optional().describe('Date de création (YYYY-MM-DD)'),
+        fiscal_year_end_date: z.string().optional().describe('Date de fin d\'exercice fiscal (YYYY-MM-DD)'),
+        turnover: z.number().optional().describe('Chiffre d\'affaires'),
+        contact_email: z.string().email().optional().describe('Email de contact'),
+        contact_name: z.string().optional().describe('Nom du contact'),
+        contact_phone: z.string().optional().describe('Téléphone du contact'),
       },
     },
     {
       name: 'search_customers',
       description: 'Recherche des clients par numéro d\'entreprise, nom d\'entreprise ou code',
       inputSchema: {
-        type: 'object',
-        properties: {
-          company_number: {
-            type: 'string',
-            description: 'Numéro d\'entreprise à rechercher',
-          },
-          company_name: {
-            type: 'string',
-            description: 'Nom d\'entreprise à rechercher',
-          },
-          code: {
-            type: 'string',
-            description: 'Code client à rechercher',
-          },
-          per_page: {
-            type: 'number',
-            description: 'Nombre d\'éléments par page (1-100)',
-            minimum: 1,
-            maximum: 100,
-          },
-          page: {
-            type: 'number',
-            description: 'Numéro de page',
-            minimum: 1,
-          },
-        },
+        company_number: z.string().optional().describe('Numéro d\'entreprise à rechercher'),
+        company_name: z.string().optional().describe('Nom d\'entreprise à rechercher'),
+        code: z.string().optional().describe('Code client à rechercher'),
+        per_page: z.number().min(1).max(100).optional().describe('Nombre d\'éléments par page (1-100)'),
+        page: z.number().min(1).optional().describe('Numéro de page'),
       },
     },
     {
       name: 'assign_customers',
       description: 'Assigne des superviseurs, contributeurs et cabinet à des clients',
       inputSchema: {
-        type: 'object',
-        properties: {
-          customers: {
-            type: 'array',
-            items: {
-              type: 'string',
-              format: 'uuid',
-            },
-            description: 'Liste des IDs des clients à assigner',
-            minItems: 1,
-          },
-          supervisor: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID du superviseur à assigner (null pour désassigner)',
-          },
-          contributors: {
-            type: 'array',
-            items: {
-              type: 'string',
-              format: 'uuid',
-            },
-            description: 'Liste des IDs des contributeurs (tableau vide pour désassigner tous)',
-          },
-          firm: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID du cabinet à assigner (null pour désassigner)',
-          },
-        },
-        required: ['customers'],
+        customers: z.array(z.string().uuid()).min(1).describe('Liste des IDs des clients à assigner'),
+        supervisor: z.string().uuid().optional().describe('ID du superviseur à assigner (null pour désassigner)'),
+        contributors: z.array(z.string().uuid()).optional().describe('Liste des IDs des contributeurs (tableau vide pour désassigner tous)'),
+        firm: z.string().uuid().optional().describe('ID du cabinet à assigner (null pour désassigner)'),
       },
     },
     {
       name: 'get_customer_risk_summary',
       description: 'Récupère le résumé des risques d\'un client',
       inputSchema: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID UUID du client',
-          },
-        },
-        required: ['id'],
+        id: z.string().uuid().describe('ID UUID du client'),
       },
     },
     // {

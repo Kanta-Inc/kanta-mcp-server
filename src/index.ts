@@ -105,7 +105,7 @@ export default function createServer({ config }: { config: z.infer<typeof config
     server.registerTool(tool.name, {
       title: tool.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
       description: tool.description || 'No description available',
-      inputSchema: tool.inputSchema as any, // Type assertion for now
+      inputSchema: tool.inputSchema || {},
     }, async (args: any, extra: any) => {
       try {
         let result;

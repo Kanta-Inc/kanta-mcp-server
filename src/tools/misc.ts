@@ -1,31 +1,25 @@
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import { KantaClient } from '../kanta-client.js';
 
-export function createMiscTools(client: KantaClient): Tool[] {
+export interface McpTool {
+  name: string;
+  description: string;
+  inputSchema?: Record<string, z.ZodType<any>>;
+}
+
+export function createMiscTools(client: KantaClient): McpTool[] {
   return [
     {
       name: 'get_firms',
       description: 'Récupère la liste des cabinets',
       inputSchema: {
-        type: 'object',
-        properties: {
-          per_page: {
-            type: 'number',
-            description: 'Nombre d\'éléments par page (1-100)',
-            minimum: 1,
-            maximum: 100,
-          },
-        },
+        per_page: z.number().min(1).max(100).optional().describe('Nombre d\'éléments par page (1-100)'),
       },
     },
     {
       name: 'get_structure',
       description: 'Récupère les informations de la structure (cabinet)',
-      inputSchema: {
-        type: 'object',
-        properties: {},
-      },
+      inputSchema: {},
     },
     // {
     //   name: 'download_file',

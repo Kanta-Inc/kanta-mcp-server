@@ -1,42 +1,27 @@
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import { KantaClient } from '../kanta-client.js';
 
-export function createPersonTools(client: KantaClient): Tool[] {
+export interface McpTool {
+  name: string;
+  description: string;
+  inputSchema?: Record<string, z.ZodType<any>>;
+}
+
+export function createPersonTools(client: KantaClient): McpTool[] {
   return [
     {
       name: 'get_persons',
       description: 'Récupère la liste des personnes avec pagination optionnelle',
       inputSchema: {
-        type: 'object',
-        properties: {
-          per_page: {
-            type: 'number',
-            description: 'Nombre d\'éléments par page (1-100)',
-            minimum: 1,
-            maximum: 100,
-          },
-          page: {
-            type: 'number',
-            description: 'Numéro de page',
-            minimum: 1,
-          },
-        },
+        per_page: z.number().min(1).max(100).optional().describe('Nombre d\'éléments par page (1-100)'),
+        page: z.number().min(1).optional().describe('Numéro de page'),
       },
     },
     {
       name: 'get_person',
       description: 'Récupère les détails d\'une personne spécifique par son ID',
       inputSchema: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'string',
-            format: 'uuid',
-            description: 'ID UUID de la personne',
-          },
-        },
-        required: ['id'],
+        id: z.string().uuid().describe('ID UUID de la personne'),
       },
     },
     // {
