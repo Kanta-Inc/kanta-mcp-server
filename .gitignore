@@ -8,6 +8,9 @@ yarn-error.log*
 dist/
 *.tsbuildinfo
 
+# Smithery build output
+.smithery/
+
 # Environment variables
 .env
 .env.local

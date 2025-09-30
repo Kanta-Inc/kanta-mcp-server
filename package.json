@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "description": "MCP server for Kanta API",
   "main": "dist/index.js",
+  "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "tsx src/index.ts",
+    "dev": "smithery dev",
+    "build": "npm run build:http",
+    "build:http": "smithery build",
+    "start": "npm run start:http",
+    "start:http": "node .smithery/index.cjs",
     "watch": "tsx --watch src/index.ts"
   },
   "keywords": [
@@ -19,11 +22,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@modelcontextprotocol/sdk": "^1.18.2",
+    "@smithery/sdk": "^1.6.4",
     "dotenv": "^17.2.0",
-    "zod": "^3.22.4"
+    "zod": "^3.25.46"
   },
   "devDependencies": {
+    "@smithery/cli": "^1.4.0",
     "@types/node": "^20.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0"
